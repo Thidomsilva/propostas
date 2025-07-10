@@ -222,6 +222,7 @@ function showPainel() {
 }
 
 function switchPage(pageId) {
+    showLoading();
     console.log(`📱 Navegando para: ${pageId}`);
     console.log(`📱 Página atual antes da troca: ${currentPage}`);
     
@@ -294,6 +295,8 @@ function switchPage(pageId) {
     if (pageId === 'dashboard' && typeof startDashboardAutoRefresh === 'function') {
         startDashboardAutoRefresh(5); // 5 minutos
     }
+
+    hideLoading();
 }
 
 // === FUNÇÕES UTILITÁRIAS ===
@@ -320,12 +323,26 @@ function formatDate(dateString) {
 
 function showLoading() {
     isLoading = true;
-    document.getElementById('loading').style.display = 'flex';
+    const loading = document.getElementById('loading');
+    if (loading) {
+        loading.style.display = 'flex';
+        const bar = loading.querySelector('.loading-bar');
+        const text = loading.querySelector('.loading-text');
+        if (bar) bar.style.display = 'block';
+        if (text) text.style.display = 'block';
+    }
 }
 
 function hideLoading() {
     isLoading = false;
-    document.getElementById('loading').style.display = 'none';
+    const loading = document.getElementById('loading');
+    if (loading) {
+        loading.style.display = 'none';
+        const bar = loading.querySelector('.loading-bar');
+        const text = loading.querySelector('.loading-text');
+        if (bar) bar.style.display = 'none';
+        if (text) text.style.display = 'none';
+    }
 }
 
 function updateDebugInfo(message) {
