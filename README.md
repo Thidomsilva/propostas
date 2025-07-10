@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Plataforma de Propostas Comerciais - Sagacy v2.0
 
 ✅ **Projeto concluído com sucesso em 09/07/2025**
@@ -46,3 +47,6 @@
 - Informações de contato
 
 **🎯 Plataforma pronta para personalização e uso!**
+=======
+# propostas
+>>>>>>> be7cea921156b1572ec1ef3e303eb3a6f20bd715
