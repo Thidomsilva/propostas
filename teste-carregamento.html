@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Dashboard - Carregamento</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .test-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .status-ok { color: #28a745; }
+        .status-error { color: #dc3545; }
+        .status-warning { color: #ffc107; }
+        
+        .component-test {
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .btn-test {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+        
+        .btn-test:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Teste do Dashboard - Carregamento</h1>
+        
+        <!-- Teste de Componentes -->
+        <div class="test-card">
+            <h2>📦 Teste de Carregamento de Componentes</h2>
+            <div id="component-status" class="test-status">
+                <span class="status-warning">⏳</span>
+                <span>Aguardando teste...</span>
+            </div>
+            
+            <button class="btn-test" onclick="testarComponentes()">
+                🔄 Testar Componentes
+            </button>
+            
+            <button class="btn-test" onclick="carregarDashboard()">
+                📊 Carregar Dashboard
+            </button>
+            
+            <button class="btn-test" onclick="testarFuncoesDashboard()">
+                🧪 Testar Funções
+            </button>
+            
+            <div id="component-details" class="component-test" style="display: none;">
+                <h3>Detalhes do Teste</h3>
+                <div id="test-results"></div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Container -->
+        <div class="test-card">
+            <h2>📊 Dashboard de Teste</h2>
+            <div id="dashboard-container">
+                <!-- Dashboard será carregado aqui -->
+            </div>
+        </div>
+        
+        <!-- Log de Testes -->
+        <div class="test-card">
+            <h2>📋 Log de Testes</h2>
+            <div id="test-log" style="font-family: monospace; background: #f8f9fa; padding: 1rem; border-radius: 4px; max-height: 300px; overflow-y: auto;">
+                Iniciando testes...<br>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/component-loader.js"></script>
+    
+    <script>
+        let testLog = document.getElementById('test-log');
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            testLog.innerHTML += `[${timestamp}] ${message}<br>`;
+            testLog.scrollTop = testLog.scrollHeight;
+            console.log(message);
+        }
+        
+        async function testarComponentes() {
+            log('🔄 Iniciando teste de componentes...');
+            
+            const status = document.getElementById('component-status');
+            const details = document.getElementById('component-details');
+            const results = document.getElementById('test-results');
+            
+            status.innerHTML = '<span class="status-warning">⏳</span><span>Testando componentes...</span>';
+            details.style.display = 'block';
+            
+            try {
+                // Testar carregamento do dashboard
+                log('📦 Carregando componente dashboard...');
+                const success = await loadComponent('./components/dashboard.html', '#dashboard-container');
+                
+                if (success) {
+                    log('✅ Componente dashboard carregado com sucesso');
+                    
+                    // Verificar se elementos existem
+                    const kpiMes = document.getElementById('kpi-mes');
+                    const rankingSolicitantes = document.getElementById('ranking-solicitantes');
+                    const servicesChart = document.getElementById('services-chart');
+                    
+                    let elementsFound = [];
+                    if (kpiMes) elementsFound.push('KPI Mês');
+                    if (rankingSolicitantes) elementsFound.push('Ranking Solicitantes');
+                    if (servicesChart) elementsFound.push('Gráfico Serviços');
+                    
+                    results.innerHTML = `
+                        <div class="status-ok">✅ Componente carregado com sucesso!</div>
+                        <div><strong>Elementos encontrados:</strong> ${elementsFound.join(', ')}</div>
+                        <div><strong>Total de elementos:</strong> ${elementsFound.length}/3</div>
+                    `;
+                    
+                    status.innerHTML = '<span class="status-ok">✅</span><span>Componentes OK</span>';
+                    log(`✅ Elementos encontrados: ${elementsFound.length}/3`);
+                    
+                } else {
+                    throw new Error('Falha ao carregar componente');
+                }
+                
+            } catch (error) {
+                log(`❌ Erro no teste: ${error.message}`);
+                status.innerHTML = '<span class="status-error">❌</span><span>Erro nos componentes</span>';
+                results.innerHTML = `<div class="status-error">❌ Erro: ${error.message}</div>`;
+            }
+        }
+        
+        async function carregarDashboard() {
+            log('📊 Carregando dashboard...');
+            
+            try {
+                // Verificar se função existe
+                if (typeof loadDashboardData === 'function') {
+                    log('✅ Função loadDashboardData encontrada');
+                    await loadDashboardData();
+                    log('✅ Dashboard carregado com sucesso');
+                } else {
+                    log('❌ Função loadDashboardData não encontrada');
+                }
+                
+            } catch (error) {
+                log(`❌ Erro ao carregar dashboard: ${error.message}`);
+            }
+        }
+        
+        async function testarFuncoesDashboard() {
+            log('🧪 Testando funções do dashboard...');
+            
+            const funcoes = [
+                'loadDashboardData',
+                'renderKPIs',
+                'renderTopSolicitantes',
+                'renderStatusDistribution',
+                'renderTopServices',
+                'renderMonthlyVolume'
+            ];
+            
+            let funcionesEncontradas = 0;
+            
+            funcoes.forEach(funcao => {
+                if (typeof window[funcao] === 'function') {
+                    log(`✅ Função ${funcao} encontrada`);
+                    funcionesEncontradas++;
+                } else {
+                    log(`❌ Função ${funcao} não encontrada`);
+                }
+            });
+            
+            log(`📊 Resumo: ${funcionesEncontradas}/${funcoes.length} funções encontradas`);
+            
+            if (funcionesEncontradas === funcoes.length) {
+                log('🎉 Todas as funções do dashboard estão disponíveis!');
+            }
+        }
+        
+        // Inicializar testes
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🚀 Página de teste carregada');
+            log('📋 Clique nos botões para executar os testes');
+        });
+    </script>
+</body>
+</html>

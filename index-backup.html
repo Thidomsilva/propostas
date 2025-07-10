@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Propostas Sagacy</title>
+    
+    <!-- CSS Modularizado -->
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/dashboard.css">
+    
+    <style>
+        .footer {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        /* Insights Grid */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .insight-card {
+            background: var(--cardBg);
+            border-radius: var(--borderRadius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        
+        /* Loading message */
+        .loading-message {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        /* Dashboard controls */
+        .dashboard-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: var(--bgSecondary);
+            border-radius: var(--borderRadius);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-controls {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .dashboard-controls .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="App">
+        <!-- Loading Spinner -->
+        <div id="loading" class="loading-container">
+            <div class="loading-spinner"></div>
+        </div>
+
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-container">
+                    <div class="logo-text">GERENCIADOR DE PROPOSTAS SAGACY</div>
+                </div>
+                <div class="header-info">
+                    <span id="user-info">Sistema de Propostas Comerciais</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Navigation -->
+            <nav class="navigation">
+                <div class="nav-buttons">
+                    <button class="nav-button active" onclick="showFormulario()">
+                        📝 Nova Solicitação
+                    </button>
+                    <button class="nav-button" onclick="showPainel()">
+                        📋 Painel de Acompanhamento
+                    </button>
+                    <button class="nav-button" onclick="showDashboard()">
+                        📊 Dashboard
+                    </button>
+                </div>
+            </nav>
+            
+            <!-- Dashboard -->
+            <div id="dashboard" class="page d-none">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Dashboard Otimizado</h2>
+                        <p class="card-subtitle">Visão geral do desempenho e métricas do sistema</p>
+                        <div class="last-refresh" id="last-refresh">Sistema inicializado</div>
+                    </div>
+                    
+                    <!-- KPIs Principais -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-icon">📈</div>
+                            <div class="kpi-content">
+                                <div class="kpi-number" id="kpi-mes">0</div>
+                                <div class="kpi-label">Solicitações este Mês</div>
+                                <div class="kpi-trend" id="kpi-mes-trend">-</div>
+                            </div>
+                        </div>
+                        
+                        <div class="kpi-card">
+                            <div class="kpi-icon">⏱️</div>
+                            <div class="kpi-content">
+                                <div class="kpi-number" id="kpi-tempo">-</div>
+                                <div class="kpi-label">Tempo Médio de Resposta</div>
+                                <div class="kpi-trend" id="kpi-tempo-trend">-</div>
+                            </div>
+                        </div>
+                        
+                        <div class="kpi-card">
+                            <div class="kpi-icon">✅</div>
+                            <div class="kpi-content">
+                                <div class="kpi-number" id="kpi-taxa">0%</div>
+                                <div class="kpi-label">Taxa de Finalização</div>
+                                <div class="kpi-trend" id="kpi-taxa-trend">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance Cards -->
+                    <div class="performance-grid">
+                        <!-- Ranking de Solicitantes -->
+                        <div class="performance-card">
+                            <h3 class="card-title">🏆 Top Solicitantes</h3>
+                            <div class="ranking-list" id="ranking-solicitantes">
+                                <div class="loading-message">Carregando ranking...</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Serviços Mais Solicitados -->
+                        <div class="performance-card">
+                            <h3 class="card-title">📊 Projetos Mais Solicitados</h3>
+                            <div class="services-chart" id="services-chart">
+                                <div class="loading-message">Carregando dados...</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Insights Grid -->
+                    <div class="insights-grid">
+                        <!-- Distribuição por Status -->
+                        <div class="insight-card">
+                            <h3 class="card-title">Distribuição por Status</h3>
+                            <div class="status-chart">
+                                <div class="status-item">
+                                    <div class="status-label">Em Andamento</div>
+                                    <div class="status-bar-container">
+                                        <div class="status-bar status-andamento" id="bar-andamento" style="width: 0%"></div>
+                                    </div>
+                                    <div class="status-percent" id="percent-andamento">0%</div>
+                                </div>
+                                
+                                <div class="status-item">
+                                    <div class="status-label">Finalizado</div>
+                                    <div class="status-bar-container">
+                                        <div class="status-bar status-finalizado" id="bar-finalizado" style="width: 0%"></div>
+                                    </div>
+                                    <div class="status-percent" id="percent-finalizado">0%</div>
+                                </div>
+                                
+                                <div class="status-item">
+                                    <div class="status-label">Aberto</div>
+                                    <div class="status-bar-container">
+                                        <div class="status-bar status-aberto" id="bar-aberto" style="width: 0%"></div>
+                                    </div>
+                                    <div class="status-percent" id="percent-aberto">0%</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Volume Mensal -->
+                        <div class="insight-card">
+                            <h3 class="card-title">Volume Mensal (Últimos 6 Meses)</h3>
+                            <div class="monthly-chart" id="monthly-chart">
+                                <div class="loading-message">Carregando dados mensais...</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dashboard Controls -->
+                    <div class="dashboard-controls">
+                        <button class="btn btn-primary" onclick="loadDashboardData()">
+                            🔄 Atualizar Dashboard
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportarRelatorio()">
+                            📊 Exportar Relatório
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulário -->
+            <div id="formulario" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Nova Solicitação</h2>
+                        <p class="card-subtitle">Preencha o formulário para criar uma nova solicitação de proposta comercial</p>
+                    </div>
+                    
+                    <form id="form-solicitacao">
+                        <div class="form-group">
+                            <label for="cliente">Cliente *</label>
+                            <input type="text" class="form-control" id="cliente" name="cliente" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="servico">Projeto *</label>
+                            <select class="form-control" id="servico" name="servico" required>
+                                <option value="">Selecione o projeto...</option>
+                                <option value="50 em 30">50 em 30</option>
+                                <option value="Auditoria Externa">Auditoria Externa</option>
+                                <option value="Auditoria Interna">Auditoria Interna</option>
+                                <option value="Business 360">Business 360</option>
+                                <option value="Business Intelligence (BI)">Business Intelligence (BI)</option>
+                                <option value="Business Plan">Business Plan</option>
+                                <option value="Business Plan - Offshore">Business Plan - Offshore</option>
+                                <option value="Capacitação de Líderes">Capacitação de Líderes</option>
+                                <option value="Capacitação in Company">Capacitação in Company</option>
+                                <option value="Coaching">Coaching</option>
+                                <option value="Comex">Comex</option>
+                                <option value="Compliance">Compliance</option>
+                                <option value="Compras Estratégicas">Compras Estratégicas</option>
+                                <option value="Consultoria Geral">Consultoria Geral</option>
+                                <option value="Formatação de Franquias">Formatação de Franquias</option>
+                                <option value="Governança Corporativa">Governança Corporativa</option>
+                                <option value="Great Place to Work">Great Place to Work</option>
+                                <option value="ISO 9001 Auditoria">ISO 9001 Auditoria</option>
+                                <option value="ISO 14001 Auditoria">ISO 14001 Auditoria</option>
+                                <option value="Lean Office">Lean Office</option>
+                                <option value="Lean Manufacturing">Lean Manufacturing</option>
+                                <option value="LGPD">LGPD</option>
+                                <option value="Líderes em Foco">Líderes em Foco</option>
+                                <option value="Mentoria Executiva">Mentoria Executiva</option>
+                                <option value="Pesquisa de Mercado">Pesquisa de Mercado</option>
+                                <option value="Programa de Integridade">Programa de Integridade</option>
+                                <option value="Team Building">Team Building</option>
+                                <option value="Valuation">Valuation</option>
+                                <option value="Outros">Outros</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="solicitante">Solicitante *</label>
+                            <select class="form-control" id="solicitante" name="solicitante" required onchange="toggleOutroSolicitante()">
+                                <option value="">Selecione o solicitante...</option>
+                                <option value="Da Silva">Da Silva</option>
+                                <option value="Edson">Edson</option>
+                                <option value="Marcos">Marcos</option>
+                                <option value="Matoso">Matoso</option>
+                                <option value="Milena">Milena</option>
+                                <option value="Thiago">Thiago</option>
+                                <option value="Victor">Victor</option>
+                                <option value="William">William</option>
+                                <option value="Outros (especificar)">Outros (especificar)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="campo-outro-solicitante" style="display: none;">
+                            <label for="outro-solicitante">Nome do Solicitante *</label>
+                            <input type="text" class="form-control" id="outro-solicitante" name="outro-solicitante" placeholder="Digite o nome completo do solicitante">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="descricao">Descrição da Solicitação *</label>
+                            <textarea class="form-control" id="descricao" name="descricao" rows="4" required placeholder="Descreva detalhadamente o que precisa ser feito..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="prazo">Prazo Desejado</label>
+                            <input type="date" class="form-control" id="prazo" name="prazo">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="observacoes">Observações Adicionais</label>
+                            <textarea class="form-control" id="observacoes" name="observacoes" rows="3" placeholder="Informações adicionais, contexto, preferências, etc."></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <span id="btn-text">Enviar Solicitação</span>
+                                <span id="btn-loading" class="d-none">Enviando...</span>
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="limparFormulario()">
+                                Limpar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Painel de Acompanhamento -->
+            <div id="painel" class="page d-none">
+                <div class="painel-header">
+                    <h2>Painel de Acompanhamento</h2>
+                    <div class="painel-actions">
+                        <input type="text" class="form-control" id="filtro-cliente" placeholder="Filtrar por cliente..." onkeyup="filtrarSolicitacoes()">
+                        <select class="form-control" id="filtro-status" onchange="filtrarSolicitacoes()">
+                            <option value="">Todos os status</option>
+                            <option value="Pendente">Pendente</option>
+                            <option value="Em Andamento">Em Andamento</option>
+                            <option value="Concluído">Concluído</option>
+                            <option value="Cancelado">Cancelado</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="loadSolicitacoes()">
+                            🔄 Atualizar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="painel-content">
+                    <div id="lista-solicitacoes" class="table-container">
+                        <p class="loading-text">Carregando solicitações...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p style="font-size: 0.9rem; opacity: 0.8;">Desenvolvido por: thiago@sagacy.com.br</p>
+            </div>
+        </footer>
+
+        <!-- Toast Container -->
+        <div id="toast-container" class="toast-container"></div>
+
+        <!-- Debug Info -->
+        <div id="debug-info" class="debug-info">
+            <div>Debug Mode: ON</div>
+            <div id="debug-last-action">-</div>
+            <div id="debug-api-status">API: Não testada</div>
+        </div>
+    </div>
+
+    <!-- JavaScript Modularizado -->
+    <script src="./js/main.js"></script>
+    <script src="./js/api.js"></script>
+    <script src="./js/dashboard.js"></script>
+    <script src="./js/formulario.js"></script>
+    <script src="./js/painel.js"></script>
+</body>
+</html>

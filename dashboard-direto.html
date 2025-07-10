@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Sagacy - Teste Direto</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Dashboard Sagacy - Teste Direto</h1>
+            <div class="test-controls">
+                <button class="btn btn-primary" onclick="testarDashboard()">
+                    🧪 Testar Dashboard
+                </button>
+                <button class="btn btn-secondary" onclick="carregarDados()">
+                    📊 Carregar Dados
+                </button>
+            </div>
+        </div>
+        
+        <!-- Status -->
+        <div class="card">
+            <div class="card-header">
+                <h2>🔍 Status do Sistema</h2>
+            </div>
+            <div id="status-sistema" class="status-grid">
+                <div class="status-item">
+                    <span class="status-label">API:</span>
+                    <span id="status-api" class="status-value">Não testada</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Dashboard:</span>
+                    <span id="status-dashboard" class="status-value">Não carregado</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Ranking:</span>
+                    <span id="status-ranking" class="status-value">Não disponível</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard -->
+        <div id="dashboard-container">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Dashboard Otimizado</h2>
+                    <p class="card-subtitle">Visão geral do desempenho e métricas do sistema</p>
+                    <div class="last-refresh" id="last-refresh">Sistema inicializado</div>
+                </div>
+                
+                <!-- KPIs Principais -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon">📈</div>
+                        <div class="kpi-content">
+                            <div class="kpi-number" id="kpi-mes">0</div>
+                            <div class="kpi-label">Solicitações este Mês</div>
+                            <div class="kpi-trend" id="kpi-mes-trend">-</div>
+                        </div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-icon">⏱️</div>
+                        <div class="kpi-content">
+                            <div class="kpi-number" id="kpi-tempo">-</div>
+                            <div class="kpi-label">Tempo Médio de Resposta</div>
+                            <div class="kpi-trend" id="kpi-tempo-trend">-</div>
+                        </div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-icon">✅</div>
+                        <div class="kpi-content">
+                            <div class="kpi-number" id="kpi-taxa">0%</div>
+                            <div class="kpi-label">Taxa de Finalização</div>
+                            <div class="kpi-trend" id="kpi-taxa-trend">-</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Performance Cards -->
+                <div class="performance-grid">
+                    <!-- Ranking de Solicitantes -->
+                    <div class="performance-card">
+                        <h3 class="card-title">🏆 Top Solicitantes</h3>
+                        <div class="ranking-list" id="ranking-solicitantes">
+                            <div class="loading-message">Carregando ranking...</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Serviços Mais Solicitados -->
+                    <div class="performance-card">
+                        <h3 class="card-title">📊 Projetos Mais Solicitados</h3>
+                        <div class="services-chart" id="services-chart">
+                            <div class="loading-message">Carregando dados...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Insights Grid -->
+                <div class="insights-grid">
+                    <!-- Distribuição por Status -->
+                    <div class="insight-card">
+                        <h3 class="card-title">Distribuição por Status</h3>
+                        <div class="status-chart">
+                            <div class="status-item">
+                                <div class="status-label">Em Andamento</div>
+                                <div class="status-bar-container">
+                                    <div class="status-bar status-andamento" id="bar-andamento" style="width: 0%"></div>
+                                </div>
+                                <div class="status-percent" id="percent-andamento">0%</div>
+                            </div>
+                            
+                            <div class="status-item">
+                                <div class="status-label">Finalizado</div>
+                                <div class="status-bar-container">
+                                    <div class="status-bar status-finalizado" id="bar-finalizado" style="width: 0%"></div>
+                                </div>
+                                <div class="status-percent" id="percent-finalizado">0%</div>
+                            </div>
+                            
+                            <div class="status-item">
+                                <div class="status-label">Aberto</div>
+                                <div class="status-bar-container">
+                                    <div class="status-bar status-aberto" id="bar-aberto" style="width: 0%"></div>
+                                </div>
+                                <div class="status-percent" id="percent-aberto">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Volume Mensal -->
+                    <div class="insight-card">
+                        <h3 class="card-title">Volume Mensal (Últimos 6 Meses)</h3>
+                        <div class="monthly-chart" id="monthly-chart">
+                            <div class="loading-message">Carregando dados mensais...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dashboard Controls -->
+                <div class="dashboard-controls">
+                    <button class="btn btn-primary" onclick="loadDashboardData()">
+                        🔄 Atualizar Dashboard
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportarRelatorio()">
+                        📊 Exportar Relatório
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+    
+    <script>
+        // Variáveis globais necessárias
+        let currentPage = 'dashboard';
+        let solicitacoes = [];
+        let debugMode = false;
+        
+        // Funções de interface
+        function showToast(message, type = 'info') {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 16px;
+                border-radius: 4px;
+                color: white;
+                font-weight: 500;
+                z-index: 9999;
+                opacity: 0;
+                transition: opacity 0.3s;
+                ${type === 'success' ? 'background: #28a745;' : ''}
+                ${type === 'error' ? 'background: #dc3545;' : ''}
+                ${type === 'warning' ? 'background: #ffc107; color: #212529;' : ''}
+                ${type === 'info' ? 'background: #17a2b8;' : ''}
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.style.opacity = '1', 100);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        function showLoading() {
+            console.log('🔄 Loading...');
+        }
+        
+        function hideLoading() {
+            console.log('✅ Loading finished');
+        }
+        
+        function updateDebugInfo(info) {
+            console.log(`[DEBUG] ${info}`);
+        }
+        
+        // Função de teste principal
+        async function testarDashboard() {
+            console.log('🧪 Iniciando teste do dashboard...');
+            
+            // Atualizar status
+            document.getElementById('status-dashboard').textContent = 'Testando...';
+            
+            // Verificar elementos
+            const elementos = [
+                'kpi-mes', 'kpi-tempo', 'kpi-taxa',
+                'ranking-solicitantes', 'services-chart',
+                'bar-andamento', 'bar-finalizado', 'bar-aberto',
+                'monthly-chart'
+            ];
+            
+            let elementosEncontrados = 0;
+            elementos.forEach(id => {
+                if (document.getElementById(id)) {
+                    elementosEncontrados++;
+                }
+            });
+            
+            console.log(`📊 Elementos encontrados: ${elementosEncontrados}/${elementos.length}`);
+            
+            if (elementosEncontrados === elementos.length) {
+                document.getElementById('status-dashboard').textContent = 'OK';
+                document.getElementById('status-dashboard').style.color = '#28a745';
+                showToast('Dashboard carregado com sucesso!', 'success');
+            } else {
+                document.getElementById('status-dashboard').textContent = 'Erro';
+                document.getElementById('status-dashboard').style.color = '#dc3545';
+                showToast('Alguns elementos não foram encontrados', 'warning');
+            }
+            
+            // Testar API
+            await testarAPI();
+        }
+        
+        async function testarAPI() {
+            console.log('🔌 Testando API...');
+            document.getElementById('status-api').textContent = 'Testando...';
+            
+            try {
+                const response = await apiCall('listar');
+                if (response && response.success) {
+                    document.getElementById('status-api').textContent = 'OK';
+                    document.getElementById('status-api').style.color = '#28a745';
+                    showToast('API funcionando!', 'success');
+                    
+                    // Testar ranking
+                    await testarRanking(response.data);
+                    
+                    return true;
+                }
+            } catch (error) {
+                document.getElementById('status-api').textContent = 'Erro';
+                document.getElementById('status-api').style.color = '#dc3545';
+                showToast('Erro na API: ' + error.message, 'error');
+                return false;
+            }
+        }
+        
+        async function testarRanking(dados) {
+            console.log('🏆 Testando ranking...');
+            document.getElementById('status-ranking').textContent = 'Testando...';
+            
+            try {
+                if (dados && dados.length > 0) {
+                    renderTopSolicitantes(dados);
+                    document.getElementById('status-ranking').textContent = 'OK';
+                    document.getElementById('status-ranking').style.color = '#28a745';
+                    showToast('Ranking gerado com sucesso!', 'success');
+                } else {
+                    document.getElementById('status-ranking').textContent = 'Sem dados';
+                    document.getElementById('status-ranking').style.color = '#ffc107';
+                    showToast('Nenhum dado para gerar ranking', 'warning');
+                }
+            } catch (error) {
+                document.getElementById('status-ranking').textContent = 'Erro';
+                document.getElementById('status-ranking').style.color = '#dc3545';
+                showToast('Erro no ranking: ' + error.message, 'error');
+            }
+        }
+        
+        async function carregarDados() {
+            console.log('📊 Carregando dados completos...');
+            
+            try {
+                await loadDashboardData();
+                showToast('Dados carregados com sucesso!', 'success');
+            } catch (error) {
+                showToast('Erro ao carregar dados: ' + error.message, 'error');
+            }
+        }
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Teste do dashboard iniciado');
+            showToast('Sistema de teste inicializado', 'info');
+        });
+    </script>
+    
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background: var(--bgSecondary);
+            border-radius: 4px;
+        }
+        
+        .status-label {
+            font-weight: 500;
+        }
+        
+        .status-value {
+            font-weight: 600;
+            color: #6c757d;
+        }
+        
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .insight-card {
+            background: var(--cardBg);
+            border-radius: var(--borderRadius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+    </style>
+</body>
+</html>

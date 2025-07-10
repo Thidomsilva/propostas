@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Teste da API - Sagacy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1e3d59;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .btn {
+            background: #1e3d59;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #2d5986;
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #e2e3e5;
+            border: 1px solid #d6d8db;
+            color: #383d41;
+        }
+        .config {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.ok {
+            background: #28a745;
+            color: white;
+        }
+        .status.error {
+            background: #dc3545;
+            color: white;
+        }
+        .status.warning {
+            background: #ffc107;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste da API Sagacy</h1>
+        
+        <div class="config">
+            <strong>📋 Configuração Atual:</strong><br>
+            <span id="config-status">Verificando configuração...</span>
+        </div>
+        
+        <div class="test-section">
+            <h3>1. 🔗 Teste de Conectividade</h3>
+            <button class="btn" onclick="testarConectividade()">Testar Conexão</button>
+            <div id="result-conectividade" class="result info" style="display:none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. 📊 Teste de API</h3>
+            <button class="btn" onclick="testarAPI()">Testar API</button>
+            <div id="result-api" class="result info" style="display:none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. 📋 Teste de Listagem</h3>
+            <button class="btn" onclick="testarListagem()">Listar Dados</button>
+            <div id="result-listagem" class="result info" style="display:none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. ✏️ Teste de Criação</h3>
+            <button class="btn" onclick="testarCriacao()">Criar Teste</button>
+            <div id="result-criacao" class="result info" style="display:none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>5. 🔄 Teste de Atualização</h3>
+            <button class="btn" onclick="testarAtualizacao()" id="btn-atualizacao" disabled>Testar Atualização</button>
+            <div id="result-atualizacao" class="result info" style="display:none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>6. 🚀 Teste Completo</h3>
+            <button class="btn" onclick="executarTodosTestes()">Executar Todos os Testes</button>
+            <div id="result-completo" class="result info" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configuração da API (mesma do main.js)
+        const API_CONFIG = {
+            BASE_URL: 'https://script.google.com/macros/s/AKfycbxVCWzcndMowKoIjUaFqFFJ3jPABhrLvjco8G8XupUU-wfhgLFa2v7M9K1Ith-NTy6XVg/exec',
+            CACHE_BUSTER: Date.now(),
+            TIMEOUT: 30000
+        };
+        
+        let ultimoIdCriado = null;
+        
+        // Verificar configuração inicial
+        document.addEventListener('DOMContentLoaded', function() {
+            verificarConfiguracao();
+        });
+        
+        function verificarConfiguracao() {
+            const configStatus = document.getElementById('config-status');
+            
+            if (API_CONFIG.BASE_URL.includes('localhost') || API_CONFIG.BASE_URL.includes('SEU_SCRIPT_ID_AQUI')) {
+                configStatus.innerHTML = `
+                    ❌ <strong>API não configurada!</strong><br>
+                    ➡️ Edite a linha BASE_URL neste arquivo<br>
+                    ➡️ Ou configure no arquivo js/main.js<br>
+                    <code>BASE_URL: 'https://script.google.com/macros/s/SUA_URL_AQUI/exec'</code>
+                `;
+            } else {
+                configStatus.innerHTML = `
+                    ✅ <strong>API configurada!</strong><br>
+                    🔗 URL: <code>${API_CONFIG.BASE_URL}</code>
+                `;
+            }
+        }
+        
+        async function testarConectividade() {
+            mostrarCarregando('result-conectividade');
+            
+            try {
+                const response = await fetch(API_CONFIG.BASE_URL + '?action=teste&_=' + Date.now());
+                
+                if (response.ok) {
+                    const data = await response.text();
+                    mostrarResultado('result-conectividade', 'success', 
+                        'Conectividade OK!\n' + 
+                        'Status: ' + response.status + '\n' +
+                        'Resposta: ' + data.substring(0, 200) + '...'
+                    );
+                } else {
+                    mostrarResultado('result-conectividade', 'error', 
+                        'Erro de conectividade!\n' +
+                        'Status: ' + response.status + '\n' +
+                        'StatusText: ' + response.statusText
+                    );
+                }
+            } catch (error) {
+                mostrarResultado('result-conectividade', 'error', 
+                    'Erro de rede!\n' + error.message
+                );
+            }
+        }
+        
+        async function testarAPI() {
+            mostrarCarregando('result-api');
+            
+            try {
+                const response = await fetch(API_CONFIG.BASE_URL + '?action=teste&_=' + Date.now());
+                const text = await response.text();
+                const data = JSON.parse(text);
+                
+                if (data.success) {
+                    mostrarResultado('result-api', 'success', 
+                        'API funcionando!\n' + JSON.stringify(data, null, 2)
+                    );
+                } else {
+                    mostrarResultado('result-api', 'error', 
+                        'API retornou erro!\n' + JSON.stringify(data, null, 2)
+                    );
+                }
+            } catch (error) {
+                mostrarResultado('result-api', 'error', 
+                    'Erro ao testar API!\n' + error.message
+                );
+            }
+        }
+        
+        async function testarListagem() {
+            mostrarCarregando('result-listagem');
+            
+            try {
+                const response = await fetch(API_CONFIG.BASE_URL + '?action=listar&_=' + Date.now());
+                const text = await response.text();
+                const data = JSON.parse(text);
+                
+                if (data.success) {
+                    mostrarResultado('result-listagem', 'success', 
+                        'Listagem OK!\n' +
+                        'Total de registros: ' + (data.data ? data.data.length : 0) + '\n' +
+                        JSON.stringify(data, null, 2)
+                    );
+                } else {
+                    mostrarResultado('result-listagem', 'error', 
+                        'Erro na listagem!\n' + JSON.stringify(data, null, 2)
+                    );
+                }
+            } catch (error) {
+                mostrarResultado('result-listagem', 'error', 
+                    'Erro ao listar dados!\n' + error.message
+                );
+            }
+        }
+        
+        async function testarCriacao() {
+            mostrarCarregando('result-criacao');
+            
+            const dadosTeste = {
+                cliente: 'Empresa Teste API',
+                servico: 'Teste Automatizado',
+                solicitante: 'Sistema de Teste',
+                descricao: 'Solicitação criada automaticamente para teste da API',
+                status: 'Pendente'
+            };
+            
+            try {
+                const response = await fetch(API_CONFIG.BASE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'criar',
+                        ...dadosTeste
+                    })
+                });
+                
+                const text = await response.text();
+                const data = JSON.parse(text);
+                
+                if (data.success) {
+                    ultimoIdCriado = data.data?.id;
+                    document.getElementById('btn-atualizacao').disabled = false;
+                    
+                    mostrarResultado('result-criacao', 'success', 
+                        'Criação bem-sucedida!\n' +
+                        'ID criado: ' + ultimoIdCriado + '\n' +
+                        JSON.stringify(data, null, 2)
+                    );
+                } else {
+                    mostrarResultado('result-criacao', 'error', 
+                        'Erro na criação!\n' + JSON.stringify(data, null, 2)
+                    );
+                }
+            } catch (error) {
+                mostrarResultado('result-criacao', 'error', 
+                    'Erro ao criar dados!\n' + error.message
+                );
+            }
+        }
+        
+        async function testarAtualizacao() {
+            if (!ultimoIdCriado) {
+                mostrarResultado('result-atualizacao', 'error', 
+                    'Erro: Execute primeiro o teste de criação!'
+                );
+                return;
+            }
+            
+            mostrarCarregando('result-atualizacao');
+            
+            try {
+                const response = await fetch(API_CONFIG.BASE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'atualizar',
+                        id: ultimoIdCriado,
+                        status: 'Em Andamento'
+                    })
+                });
+                
+                const text = await response.text();
+                const data = JSON.parse(text);
+                
+                if (data.success) {
+                    mostrarResultado('result-atualizacao', 'success', 
+                        'Atualização bem-sucedida!\n' +
+                        JSON.stringify(data, null, 2)
+                    );
+                } else {
+                    mostrarResultado('result-atualizacao', 'error', 
+                        'Erro na atualização!\n' + JSON.stringify(data, null, 2)
+                    );
+                }
+            } catch (error) {
+                mostrarResultado('result-atualizacao', 'error', 
+                    'Erro ao atualizar dados!\n' + error.message
+                );
+            }
+        }
+        
+        async function executarTodosTestes() {
+            mostrarCarregando('result-completo');
+            
+            const testes = [
+                { nome: 'Conectividade', func: testarConectividade },
+                { nome: 'API', func: testarAPI },
+                { nome: 'Listagem', func: testarListagem },
+                { nome: 'Criação', func: testarCriacao },
+                { nome: 'Atualização', func: testarAtualizacao }
+            ];
+            
+            let resultados = 'Executando todos os testes...\n\n';
+            let sucessos = 0;
+            
+            for (const teste of testes) {
+                try {
+                    await teste.func();
+                    resultados += `✅ ${teste.nome}: OK\n`;
+                    sucessos++;
+                } catch (error) {
+                    resultados += `❌ ${teste.nome}: ERRO - ${error.message}\n`;
+                }
+                
+                // Pausa entre testes
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            resultados += `\n📊 Resultado: ${sucessos}/${testes.length} testes passaram\n`;
+            
+            if (sucessos === testes.length) {
+                resultados += '\n🎉 Todos os testes passaram! API está funcionando perfeitamente!';
+                mostrarResultado('result-completo', 'success', resultados);
+            } else {
+                resultados += '\n⚠️ Alguns testes falharam. Verifique as configurações.';
+                mostrarResultado('result-completo', 'error', resultados);
+            }
+        }
+        
+        function mostrarCarregando(elementId) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = 'result info';
+            element.textContent = '🔄 Carregando...';
+        }
+        
+        function mostrarResultado(elementId, tipo, texto) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = 'result ' + tipo;
+            element.textContent = texto;
+        }
+    </script>
+</body>
+</html>

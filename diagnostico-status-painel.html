@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico - Atualização de Status no Painel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .status-pendente {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .status-em-andamento {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .status-concluido {
+            background-color: #198754;
+            color: white;
+        }
+        .status-cancelado {
+            background-color: #dc3545;
+            color: white;
+        }
+        .debug-info {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+        .highlight {
+            background-color: yellow;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">🔍 Diagnóstico - Atualização de Status no Painel</h2>
+                <p class="card-subtitle text-muted">Testando a atualização local do status após mudança</p>
+            </div>
+            <div class="card-body">
+                
+                <div class="alert alert-info">
+                    <h5>📝 Objetivo do Teste:</h5>
+                    <p>Verificar se o status é atualizado localmente na tabela do painel após a mudança, 
+                    diagnosticando problemas de sincronização local.</p>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <button class="btn btn-primary" onclick="carregarDados()">
+                            🔄 Carregar Dados
+                        </button>
+                        <button class="btn btn-info" onclick="simularMudancaStatus()">
+                            🧪 Simular Mudança
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-warning" onclick="limparLogs()">
+                            🧹 Limpar Logs
+                        </button>
+                        <button class="btn btn-success" onclick="testarComparacao()">
+                            🔍 Testar Comparação IDs
+                        </button>
+                    </div>
+                </div>
+
+                <div class="debug-info">
+                    <h6>📊 Logs de Diagnóstico:</h6>
+                    <div id="logs"></div>
+                </div>
+
+                <div class="table-container">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Solicitante</th>
+                                <th>Cliente</th>
+                                <th>Projeto</th>
+                                <th>Status (Badge)</th>
+                                <th>Data</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-diagnostico">
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">
+                                    Clique em "Carregar Dados" para iniciar o diagnóstico
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4">
+                    <h5>🔍 Informações de Debug:</h5>
+                    <div id="debug-info" class="debug-info">
+                        <em>Dados de debug aparecerão aqui...</em>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === CONFIGURAÇÕES ===
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwL7vGQbHyJ-lmDTcRHvuEQKZdGnZNvHZrVzBgPJo5JzqBrSgXmyBPWEbmjFJCIYRKZFQ/exec';
+        
+        // === DADOS SIMULADOS ===
+        let solicitacoes = [];
+        let logCount = 0;
+
+        // === FUNÇÕES DE LOG ===
+        function adicionarLog(mensagem, tipo = 'info') {
+            logCount++;
+            const timestamp = new Date().toLocaleTimeString();
+            const cor = {
+                'info': 'text-info',
+                'success': 'text-success', 
+                'warning': 'text-warning',
+                'error': 'text-danger'
+            }[tipo] || 'text-info';
+            
+            const logDiv = document.getElementById('logs');
+            logDiv.innerHTML += `<div class="${cor}">[${timestamp}] ${mensagem}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function limparLogs() {
+            document.getElementById('logs').innerHTML = '';
+            logCount = 0;
+            adicionarLog('Logs limpos', 'info');
+        }
+
+        // === FUNÇÕES UTILITÁRIAS ===
+        function getStatusClass(status) {
+            const classes = {
+                'Pendente': 'status-pendente',
+                'Em Andamento': 'status-em-andamento',
+                'Concluído': 'status-concluido',
+                'Cancelado': 'status-cancelado'
+            };
+            return classes[status] || 'status-pendente';
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('pt-BR');
+            } catch (error) {
+                return '-';
+            }
+        }
+
+        // === FUNÇÃO PRINCIPAL DE CARREGAMENTO ===
+        async function carregarDados() {
+            try {
+                adicionarLog('📋 Iniciando carregamento de dados...', 'info');
+                
+                // Fazer chamada real para API
+                const response = await fetch(API_URL + '?acao=listar');
+                const data = await response.text();
+                
+                adicionarLog(`📡 Resposta recebida: ${data.substring(0, 100)}...`, 'info');
+                
+                // Tentar fazer parse do JSON
+                let parsedData;
+                try {
+                    parsedData = JSON.parse(data);
+                } catch (parseError) {
+                    adicionarLog('⚠️ Erro de parse JSON, tentando extrair...', 'warning');
+                    // Tentar extrair JSON válido
+                    const jsonMatch = data.match(/\{[\s\S]*\}/);
+                    if (jsonMatch) {
+                        parsedData = JSON.parse(jsonMatch[0]);
+                        adicionarLog('✅ JSON extraído com sucesso', 'success');
+                    } else {
+                        throw new Error('Não foi possível extrair JSON válido');
+                    }
+                }
+                
+                adicionarLog(`📊 Dados parseados: ${JSON.stringify(parsedData, null, 2)}`, 'info');
+                
+                // Verificar estrutura da resposta
+                const dados = parsedData?.data || parsedData?.dados || [];
+                const isSuccess = parsedData?.success || parsedData?.sucesso || false;
+                
+                if (isSuccess && Array.isArray(dados)) {
+                    solicitacoes = dados;
+                    renderizarTabela();
+                    adicionarLog(`✅ ${solicitacoes.length} solicitações carregadas`, 'success');
+                    atualizarDebugInfo();
+                } else {
+                    throw new Error('Dados inválidos recebidos');
+                }
+                
+            } catch (error) {
+                adicionarLog(`❌ Erro ao carregar dados: ${error.message}`, 'error');
+                
+                // Usar dados simulados para teste
+                adicionarLog('🧪 Carregando dados simulados para teste...', 'warning');
+                solicitacoes = [
+                    {
+                        id: "1",
+                        solicitante: "João Silva",
+                        cliente: "Empresa A",
+                        servico: "Projeto Web",
+                        status: "Pendente",
+                        data: "2024-01-15"
+                    },
+                    {
+                        id: "2", 
+                        solicitante: "Maria Santos",
+                        cliente: "Empresa B",
+                        servico: "Consultoria",
+                        status: "Em Andamento",
+                        data: "2024-01-14"
+                    },
+                    {
+                        id: "3",
+                        solicitante: "Pedro Costa",
+                        cliente: "Empresa C", 
+                        servico: "Análise",
+                        status: "Concluído",
+                        data: "2024-01-13"
+                    }
+                ];
+                renderizarTabela();
+                atualizarDebugInfo();
+            }
+        }
+
+        // === FUNÇÃO DE RENDERIZAÇÃO ===
+        function renderizarTabela() {
+            const tbody = document.getElementById('tabela-diagnostico');
+            if (!tbody) return;
+            
+            adicionarLog('🎨 Renderizando tabela...', 'info');
+            
+            if (solicitacoes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">
+                            Nenhuma solicitação encontrada
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = solicitacoes.map(item => `
+                <tr data-id="${item.id}">
+                    <td><span class="highlight">${item.id}</span> (${typeof item.id})</td>
+                    <td>${item.solicitante || '-'}</td>
+                    <td>${item.cliente || '-'}</td>
+                    <td>${item.servico || '-'}</td>
+                    <td>
+                        <span class="status-badge ${getStatusClass(item.status)}">
+                            ${item.status || 'Pendente'}
+                        </span>
+                    </td>
+                    <td>${formatDate(item.data) || '-'}</td>
+                    <td>
+                        <select class="form-control" onchange="atualizarStatus('${item.id}', this.value)">
+                            <option value="Pendente" ${item.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
+                            <option value="Em Andamento" ${item.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
+                            <option value="Concluído" ${item.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
+                            <option value="Cancelado" ${item.status === 'Cancelado' ? 'selected' : ''}>Cancelado</option>
+                        </select>
+                    </td>
+                </tr>
+            `).join('');
+            
+            adicionarLog('✅ Tabela renderizada com sucesso', 'success');
+        }
+
+        // === FUNÇÃO DE ATUALIZAÇÃO DE STATUS ===
+        async function atualizarStatus(id, novoStatus) {
+            try {
+                adicionarLog(`🔄 Atualizando status: ID=${id} (${typeof id}) -> ${novoStatus}`, 'info');
+                
+                // Buscar item ANTES da atualização
+                const itemAntes = solicitacoes.find(s => {
+                    adicionarLog(`🔍 Comparando: ${s.id} (${typeof s.id}) == ${id} (${typeof id})`, 'info');
+                    return s.id == id;
+                });
+                
+                if (itemAntes) {
+                    adicionarLog(`✅ Item encontrado ANTES: ${JSON.stringify(itemAntes)}`, 'success');
+                } else {
+                    adicionarLog(`❌ Item NÃO encontrado ANTES da atualização`, 'error');
+                    adicionarLog(`📊 IDs disponíveis: ${solicitacoes.map(s => `${s.id} (${typeof s.id})`).join(', ')}`, 'info');
+                }
+                
+                // Simular chamada para API (pode falhar, mas vamos testar a atualização local)
+                let apiSuccess = false;
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            acao: 'atualizar',
+                            id: id,
+                            status: novoStatus
+                        })
+                    });
+                    
+                    const data = await response.text();
+                    const parsedData = JSON.parse(data);
+                    apiSuccess = parsedData?.success || parsedData?.sucesso || false;
+                    
+                    if (apiSuccess) {
+                        adicionarLog('✅ Status atualizado no servidor', 'success');
+                    } else {
+                        adicionarLog('⚠️ API retornou erro, mas continuando teste local...', 'warning');
+                    }
+                } catch (apiError) {
+                    adicionarLog(`⚠️ Erro na API: ${apiError.message}, continuando teste local...`, 'warning');
+                }
+                
+                // TESTE DA ATUALIZAÇÃO LOCAL (independente do resultado da API)
+                adicionarLog('🧪 Testando atualização local...', 'info');
+                
+                const item = solicitacoes.find(s => {
+                    const comparacao = s.id == id;
+                    adicionarLog(`🔍 Comparação: ${s.id} == ${id} = ${comparacao}`, 'info');
+                    return comparacao;
+                });
+                
+                if (item) {
+                    adicionarLog(`✅ Item encontrado para atualização: ${JSON.stringify(item)}`, 'success');
+                    
+                    const statusAnterior = item.status;
+                    item.status = novoStatus;
+                    
+                    adicionarLog(`🔄 Status alterado de "${statusAnterior}" para "${item.status}"`, 'info');
+                    
+                    // Re-renderizar tabela
+                    renderizarTabela();
+                    
+                    // Verificar se a mudança foi aplicada
+                    const itemVerificacao = solicitacoes.find(s => s.id == id);
+                    if (itemVerificacao && itemVerificacao.status === novoStatus) {
+                        adicionarLog('✅ Atualização local CONFIRMADA na array', 'success');
+                        
+                        // Verificar se apareceu na tabela
+                        const linha = document.querySelector(`tr[data-id="${id}"]`);
+                        if (linha) {
+                            const statusBadge = linha.querySelector('.status-badge');
+                            if (statusBadge && statusBadge.textContent.trim() === novoStatus) {
+                                adicionarLog('✅ Atualização local CONFIRMADA na tabela HTML', 'success');
+                            } else {
+                                adicionarLog('❌ Atualização local FALHOU na tabela HTML', 'error');
+                            }
+                        } else {
+                            adicionarLog('❌ Linha não encontrada na tabela HTML', 'error');
+                        }
+                    } else {
+                        adicionarLog('❌ Atualização local FALHOU na array', 'error');
+                    }
+                    
+                    atualizarDebugInfo();
+                } else {
+                    adicionarLog('❌ Item não encontrado na lista local', 'error');
+                    adicionarLog(`📊 IDs disponíveis: ${solicitacoes.map(s => `${s.id} (${typeof s.id})`).join(', ')}`, 'info');
+                }
+                
+            } catch (error) {
+                adicionarLog(`❌ Erro geral na atualização: ${error.message}`, 'error');
+            }
+        }
+
+        // === FUNÇÃO DE SIMULAÇÃO ===
+        function simularMudancaStatus() {
+            if (solicitacoes.length === 0) {
+                adicionarLog('⚠️ Nenhuma solicitação carregada. Carregue os dados primeiro.', 'warning');
+                return;
+            }
+            
+            const primeiroItem = solicitacoes[0];
+            const novosStatus = ['Pendente', 'Em Andamento', 'Concluído', 'Cancelado'];
+            const statusAtual = primeiroItem.status;
+            const novoStatus = novosStatus.find(s => s !== statusAtual) || 'Em Andamento';
+            
+            adicionarLog(`🧪 Simulando mudança no item ID=${primeiroItem.id}: ${statusAtual} -> ${novoStatus}`, 'info');
+            atualizarStatus(primeiroItem.id, novoStatus);
+        }
+
+        // === FUNÇÃO DE TESTE DE COMPARAÇÃO ===
+        function testarComparacao() {
+            if (solicitacoes.length === 0) {
+                adicionarLog('⚠️ Nenhuma solicitação carregada. Carregue os dados primeiro.', 'warning');
+                return;
+            }
+            
+            adicionarLog('🔍 Testando comparações de ID...', 'info');
+            
+            solicitacoes.forEach(item => {
+                const id = item.id;
+                const tipoId = typeof id;
+                
+                adicionarLog(`📊 Item ID: ${id} (${tipoId})`, 'info');
+                
+                // Testar diferentes tipos de comparação
+                const comparacoes = [
+                    { teste: `${id} == "${id}"`, resultado: id == String(id) },
+                    { teste: `${id} === "${id}"`, resultado: id === String(id) },
+                    { teste: `${id} == ${Number(id)}`, resultado: id == Number(id) },
+                    { teste: `${id} === ${Number(id)}`, resultado: id === Number(id) }
+                ];
+                
+                comparacoes.forEach(comp => {
+                    const cor = comp.resultado ? 'success' : 'warning';
+                    adicionarLog(`   ${comp.teste} = ${comp.resultado}`, cor);
+                });
+            });
+        }
+
+        // === FUNÇÃO DE DEBUG INFO ===
+        function atualizarDebugInfo() {
+            const debugDiv = document.getElementById('debug-info');
+            debugDiv.innerHTML = `
+                <h6>📊 Estado Atual:</h6>
+                <p><strong>Total de solicitações:</strong> ${solicitacoes.length}</p>
+                <p><strong>IDs e tipos:</strong></p>
+                <ul>
+                    ${solicitacoes.map(item => 
+                        `<li>ID: ${item.id} (${typeof item.id}) - Status: ${item.status}</li>`
+                    ).join('')}
+                </ul>
+                <p><strong>Logs gerados:</strong> ${logCount}</p>
+            `;
+        }
+
+        // === INICIALIZAÇÃO ===
+        document.addEventListener('DOMContentLoaded', function() {
+            adicionarLog('🚀 Diagnóstico carregado e pronto para uso', 'success');
+            adicionarLog('💡 Clique em "Carregar Dados" para começar', 'info');
+        });
+    </script>
+</body>
+</html>

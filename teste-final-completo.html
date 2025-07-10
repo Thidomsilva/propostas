@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Final - Sistema Sagacy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .test-section h2 {
+            color: #007bff;
+            margin-top: 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .loading {
+            color: #856404;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Teste Final - Sistema Sagacy</h1>
+        
+        <div class="status" id="statusGeral">
+            <strong>Status:</strong> Pronto para testes
+        </div>
+        
+        <!-- Teste 1: Conectividade -->
+        <div class="test-section">
+            <h2>1. Teste de Conectividade</h2>
+            <p>Verificar se a API está respondendo corretamente.</p>
+            <button onclick="testarConectividade()">Testar Conectividade</button>
+            <div id="resultado-conectividade" class="result" style="display: none;"></div>
+        </div>
+        
+        <!-- Teste 2: Listagem -->
+        <div class="test-section">
+            <h2>2. Teste de Listagem</h2>
+            <p>Carregar todas as solicitações da planilha.</p>
+            <button onclick="testarListagem()">Testar Listagem</button>
+            <div id="resultado-listagem" class="result" style="display: none;"></div>
+        </div>
+        
+        <!-- Teste 3: Criação -->
+        <div class="test-section">
+            <h2>3. Teste de Criação</h2>
+            <p>Criar uma nova solicitação de teste.</p>
+            
+            <div class="form-group">
+                <label for="cliente">Cliente:</label>
+                <input type="text" id="cliente" value="Cliente Teste">
+            </div>
+            
+            <div class="form-group">
+                <label for="servico">Serviço:</label>
+                <select id="servico">
+                    <option value="Consultoria Empresarial">Consultoria Empresarial</option>
+                    <option value="Auditoria">Auditoria</option>
+                    <option value="Treinamento">Treinamento</option>
+                    <option value="Outro">Outro</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="solicitante">Solicitante:</label>
+                <select id="solicitante">
+                    <option value="Thiago Pereira">Thiago Pereira</option>
+                    <option value="João Silva">João Silva</option>
+                    <option value="Maria Santos">Maria Santos</option>
+                    <option value="Sistema Teste">Sistema Teste</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="descricao">Descrição:</label>
+                <textarea id="descricao" placeholder="Descrição da solicitação...">Teste automático do sistema Sagacy realizado em ${new Date().toLocaleString('pt-BR')}</textarea>
+            </div>
+            
+            <button onclick="testarCriacao()">Criar Solicitação de Teste</button>
+            <div id="resultado-criacao" class="result" style="display: none;"></div>
+        </div>
+        
+        <!-- Teste 4: E-mail -->
+        <div class="test-section">
+            <h2>4. Teste de E-mail</h2>
+            <p>Verificar se o sistema de notificações por e-mail está funcionando.</p>
+            <button onclick="testarEmail()">Testar Envio de E-mail</button>
+            <div id="resultado-email" class="result" style="display: none;"></div>
+        </div>
+        
+        <!-- Teste 5: Teste Completo -->
+        <div class="test-section">
+            <h2>5. Teste Completo</h2>
+            <p>Executar todos os testes em sequência.</p>
+            <button onclick="executarTesteCompleto()">Executar Teste Completo</button>
+            <div id="resultado-completo" class="result" style="display: none;"></div>
+        </div>
+        
+        <!-- Logs -->
+        <div class="test-section">
+            <h2>📋 Logs do Sistema</h2>
+            <button onclick="limparLogs()">Limpar Logs</button>
+            <div id="logs" class="result info" style="display: block;">
+                Sistema iniciado. Aguardando testes...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== CONFIGURAÇÃO =====
+        const API_URL = 'https://script.google.com/macros/s/AKfycbw-jMfWF5F7I_1kRUddL7ou7Y6JtJeDs271CV2sT1mOwcLEUESy3oOkGDMl7eA4b6kiBw/exec';
+        
+        // ===== FUNÇÕES AUXILIARES =====
+        function log(mensagem) {
+            const logs = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString('pt-BR');
+            logs.innerHTML += `\n[${timestamp}] ${mensagem}`;
+            logs.scrollTop = logs.scrollHeight;
+            console.log(`[${timestamp}] ${mensagem}`);
+        }
+        
+        function mostrarResultado(elementId, resultado, sucesso = true) {
+            const elemento = document.getElementById(elementId);
+            elemento.style.display = 'block';
+            elemento.className = `result ${sucesso ? 'success' : 'error'}`;
+            elemento.textContent = typeof resultado === 'object' ? JSON.stringify(resultado, null, 2) : resultado;
+        }
+        
+        function mostrarCarregando(elementId) {
+            const elemento = document.getElementById(elementId);
+            elemento.style.display = 'block';
+            elemento.className = 'result loading';
+            elemento.textContent = 'Carregando...';
+        }
+        
+        function atualizarStatus(mensagem, tipo = 'info') {
+            const status = document.getElementById('statusGeral');
+            status.className = `status ${tipo}`;
+            status.innerHTML = `<strong>Status:</strong> ${mensagem}`;
+        }
+        
+        function limparLogs() {
+            document.getElementById('logs').innerHTML = 'Logs limpos. Aguardando novos testes...';
+        }
+        
+        // ===== TESTES =====
+        async function testarConectividade() {
+            log('🔌 Iniciando teste de conectividade...');
+            mostrarCarregando('resultado-conectividade');
+            atualizarStatus('Testando conectividade...', 'loading');
+            
+            try {
+                const response = await fetch(API_URL + '?action=listar&teste=conectividade', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                log(`📡 Status da resposta: ${response.status}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                log('✅ Conectividade testada com sucesso');
+                
+                mostrarResultado('resultado-conectividade', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: Object.fromEntries(response.headers.entries()),
+                    data: data
+                }, true);
+                
+                atualizarStatus('Conectividade OK', 'success');
+                return true;
+                
+            } catch (error) {
+                log(`❌ Erro de conectividade: ${error.message}`);
+                mostrarResultado('resultado-conectividade', `ERRO: ${error.message}`, false);
+                atualizarStatus('Erro de conectividade', 'error');
+                return false;
+            }
+        }
+        
+        async function testarListagem() {
+            log('📋 Iniciando teste de listagem...');
+            mostrarCarregando('resultado-listagem');
+            atualizarStatus('Testando listagem...', 'loading');
+            
+            try {
+                const response = await fetch(API_URL + '?action=listar', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                log(`📋 Listagem retornou ${data.dados ? data.dados.length : 0} registros`);
+                
+                mostrarResultado('resultado-listagem', data, data.sucesso);
+                atualizarStatus('Listagem OK', 'success');
+                return data;
+                
+            } catch (error) {
+                log(`❌ Erro na listagem: ${error.message}`);
+                mostrarResultado('resultado-listagem', `ERRO: ${error.message}`, false);
+                atualizarStatus('Erro na listagem', 'error');
+                return null;
+            }
+        }
+        
+        async function testarCriacao() {
+            log('📝 Iniciando teste de criação...');
+            mostrarCarregando('resultado-criacao');
+            atualizarStatus('Testando criação...', 'loading');
+            
+            const dados = {
+                action: 'criar',
+                cliente: document.getElementById('cliente').value,
+                servico: document.getElementById('servico').value,
+                solicitante: document.getElementById('solicitante').value,
+                descricao: document.getElementById('descricao').value.replace('${new Date().toLocaleString(\'pt-BR\')}', new Date().toLocaleString('pt-BR'))
+            };
+            
+            log(`📝 Dados a serem enviados: ${JSON.stringify(dados)}`);
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dados)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const resultado = await response.json();
+                log(`✅ Solicitação criada: ${resultado.mensagem}`);
+                
+                mostrarResultado('resultado-criacao', resultado, resultado.sucesso);
+                atualizarStatus('Criação OK', 'success');
+                return resultado;
+                
+            } catch (error) {
+                log(`❌ Erro na criação: ${error.message}`);
+                mostrarResultado('resultado-criacao', `ERRO: ${error.message}`, false);
+                atualizarStatus('Erro na criação', 'error');
+                return null;
+            }
+        }
+        
+        async function testarEmail() {
+            log('📧 Iniciando teste de e-mail...');
+            mostrarCarregando('resultado-email');
+            atualizarStatus('Testando e-mail...', 'loading');
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'teste_email'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const resultado = await response.json();
+                log(`📧 Teste de e-mail: ${resultado.mensagem}`);
+                
+                mostrarResultado('resultado-email', resultado, resultado.sucesso);
+                atualizarStatus('E-mail OK', 'success');
+                return resultado;
+                
+            } catch (error) {
+                log(`❌ Erro no teste de e-mail: ${error.message}`);
+                mostrarResultado('resultado-email', `ERRO: ${error.message}`, false);
+                atualizarStatus('Erro no e-mail', 'error');
+                return null;
+            }
+        }
+        
+        async function executarTesteCompleto() {
+            log('🚀 Iniciando teste completo do sistema...');
+            mostrarCarregando('resultado-completo');
+            atualizarStatus('Executando teste completo...', 'loading');
+            
+            const resultados = {
+                conectividade: null,
+                listagem: null,
+                criacao: null,
+                email: null,
+                timestamp: new Date().toISOString()
+            };
+            
+            try {
+                // Teste 1: Conectividade
+                log('1/4 - Testando conectividade...');
+                resultados.conectividade = await testarConectividade();
+                
+                // Aguardar um pouco entre testes
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Teste 2: Listagem
+                log('2/4 - Testando listagem...');
+                resultados.listagem = await testarListagem();
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Teste 3: Criação
+                log('3/4 - Testando criação...');
+                resultados.criacao = await testarCriacao();
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Teste 4: E-mail
+                log('4/4 - Testando e-mail...');
+                resultados.email = await testarEmail();
+                
+                // Resultado final
+                const sucessos = Object.values(resultados).filter(r => r && r !== null).length;
+                const total = 4;
+                
+                log(`🎉 Teste completo finalizado: ${sucessos}/${total} testes bem-sucedidos`);
+                
+                mostrarResultado('resultado-completo', {
+                    resumo: `${sucessos}/${total} testes bem-sucedidos`,
+                    detalhes: resultados
+                }, sucessos === total);
+                
+                atualizarStatus(`Teste completo: ${sucessos}/${total} sucessos`, sucessos === total ? 'success' : 'error');
+                
+            } catch (error) {
+                log(`❌ Erro crítico no teste completo: ${error.message}`);
+                mostrarResultado('resultado-completo', `ERRO CRÍTICO: ${error.message}`, false);
+                atualizarStatus('Erro crítico no teste', 'error');
+            }
+        }
+        
+        // ===== INICIALIZAÇÃO =====
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🚀 Sistema de testes carregado');
+            log(`🔗 API URL: ${API_URL}`);
+            
+            // Preencher data atual na descrição
+            const descricao = document.getElementById('descricao');
+            descricao.value = `Teste automático do sistema Sagacy realizado em ${new Date().toLocaleString('pt-BR')}`;
+            
+            atualizarStatus('Sistema pronto para testes', 'info');
+        });
+    </script>
+</body>
+</html>

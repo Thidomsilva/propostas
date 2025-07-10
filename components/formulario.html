@@ -1,0 +1,89 @@
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Nova Solicitação</h2>
+        <p class="card-subtitle">Preencha o formulário para criar uma nova solicitação de proposta comercial</p>
+    </div>
+    
+    <form id="form-solicitacao">
+        <div class="form-group">
+            <label for="cliente">Cliente *</label>
+            <input type="text" class="form-control" id="cliente" name="cliente" required>
+        </div>
+
+        <div class="form-group">
+            <label for="servico">Projeto *</label>
+            <select class="form-control" id="servico" name="servico" required>
+                <option value="">Selecione o projeto...</option>
+                <option value="50 em 30">50 em 30</option>
+                <option value="Auditoria Externa">Auditoria Externa</option>
+                <option value="Auditoria Interna">Auditoria Interna</option>
+                <option value="Business 360">Business 360</option>
+                <option value="Business Intelligence (BI)">Business Intelligence (BI)</option>
+                <option value="Business Plan">Business Plan</option>
+                <option value="Business Plan - Offshore">Business Plan - Offshore</option>
+                <option value="Capacitação de Líderes">Capacitação de Líderes</option>
+                <option value="Capacitação in Company">Capacitação in Company</option>
+                <option value="Coaching">Coaching</option>
+                <option value="Comex">Comex</option>
+                <option value="Compliance">Compliance</option>
+                <option value="Compras Estratégicas">Compras Estratégicas</option>
+                <option value="Consultoria Geral">Consultoria Geral</option>
+                <option value="Formatação de Franquias">Formatação de Franquias</option>
+                <option value="Governança Corporativa">Governança Corporativa</option>
+                <option value="Great Place to Work">Great Place to Work</option>
+                <option value="ISO 9001 Auditoria">ISO 9001 Auditoria</option>
+                <option value="ISO 14001 Auditoria">ISO 14001 Auditoria</option>
+                <option value="Lean Office">Lean Office</option>
+                <option value="Lean Manufacturing">Lean Manufacturing</option>
+                <option value="LGPD">LGPD</option>
+                <option value="Líderes em Foco">Líderes em Foco</option>
+                <option value="Mentoria Executiva">Mentoria Executiva</option>
+                <option value="Pesquisa de Mercado">Pesquisa de Mercado</option>
+                <option value="Programa de Integridade">Programa de Integridade</option>
+                <option value="Team Building">Team Building</option>
+                <option value="Valuation">Valuation</option>
+                <option value="Outros">Outros</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="solicitante">Solicitante *</label>
+            <select class="form-control" id="solicitante" name="solicitante" required onchange="toggleOutroSolicitante()">
+                <option value="">Selecione o solicitante...</option>
+                <option value="Da Silva">Da Silva</option>
+                <option value="Edson">Edson</option>
+                <option value="Marcos">Marcos</option>
+                <option value="Matoso">Matoso</option>
+                <option value="Milena">Milena</option>
+                <option value="Thiago">Thiago</option>
+                <option value="Victor">Victor</option>
+                <option value="William">William</option>
+                <option value="Outros (especificar)">Outros (especificar)</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="campo-outro-solicitante" style="display: none;">
+            <label for="outro-solicitante">Nome do Solicitante *</label>
+            <input type="text" class="form-control" id="outro-solicitante" name="outro-solicitante" placeholder="Digite o nome completo do solicitante">
+        </div>
+
+        <div class="form-group">
+            <label for="descricao">Descrição do Projeto *</label>
+            <textarea class="form-control" id="descricao" name="descricao" required placeholder="Descreva detalhadamente o projeto solicitado..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="prazo">Prazo Desejado</label>
+            <input type="date" class="form-control" id="prazo" name="prazo">
+        </div>
+
+        <div class="form-group">
+            <label for="observacoes">Observações Adicionais</label>
+            <textarea class="form-control" id="observacoes" name="observacoes" placeholder="Informações complementares, requisitos específicos, etc."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">
+            Enviar Solicitação
+        </button>
+    </form>
+</div>

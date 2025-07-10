@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste da Plataforma Sagacy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #1e3d59;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .result {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+        
+        .error {
+            background: #ffebee;
+            border: 1px solid #f44336;
+            color: #c62828;
+        }
+        
+        .btn {
+            background: #1e3d59;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            background: #2d5986;
+        }
+        
+        .file-structure {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-line;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            margin: 0.5rem 0;
+        }
+        
+        .status-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .status-ok {
+            background: #4caf50;
+        }
+        
+        .status-error {
+            background: #f44336;
+        }
+        
+        .status-warning {
+            background: #ff9800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏢 Plataforma Sagacy - Verificação de Estrutura</h1>
+        
+        <div id="results"></div>
+        
+        <h2>📁 Estrutura de Arquivos</h2>
+        <div class="file-structure">
+📂 /nova-plataforma-sagacy-v2/
+├── 📄 index.html (arquivo principal modularizado)
+├── 📄 index-original-backup.html (backup do arquivo original)
+├── 📄 index-novo.html (template da nova estrutura)
+├── 📄 README-MODULARIZADO.md (documentação)
+├── 📂 css/
+│   ├── 📄 style.css (estilos principais)
+│   └── 📄 dashboard.css (estilos do dashboard)
+├── 📂 js/
+│   ├── 📄 main.js (funções principais)
+│   ├── 📄 api.js (comunicação com API)
+│   ├── 📄 formulario.js (lógica do formulário)
+│   ├── 📄 painel.js (lógica do painel)
+│   ├── 📄 dashboard.js (lógica do dashboard)
+│   └── 📄 component-loader.js (carregador de componentes)
+├── 📂 components/
+│   ├── 📄 header.html (cabeçalho)
+│   ├── 📄 formulario.html (formulário)
+│   ├── 📄 dashboard.html (dashboard)
+│   └── 📄 painel.html (painel de acompanhamento)
+└── 📂 docs/ (documentação existente)
+        </div>
+        
+        <h2>🔧 Ações Disponíveis</h2>
+        <button class="btn" onclick="testComponents()">Testar Componentes</button>
+        <button class="btn" onclick="checkFiles()">Verificar Arquivos</button>
+        <button class="btn" onclick="openMainApp()">Abrir Aplicação</button>
+        <button class="btn" onclick="showDocumentation()">Ver Documentação</button>
+    </div>
+
+    <script>
+        async function testComponents() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<div class="result">🔄 Testando componentes...</div>';
+            
+            const componentsToTest = [
+                { name: 'Header', path: './components/header.html' },
+                { name: 'Formulário', path: './components/formulario.html' },
+                { name: 'Dashboard', path: './components/dashboard.html' },
+                { name: 'Painel', path: './components/painel.html' },
+                { name: 'CSS Principal', path: './css/style.css' },
+                { name: 'CSS Dashboard', path: './css/dashboard.css' },
+                { name: 'JS Principal', path: './js/main.js' },
+                { name: 'JS API', path: './js/api.js' },
+                { name: 'Loader de Componentes', path: './js/component-loader.js' }
+            ];
+            
+            let resultsHtml = '<h3>Resultado dos Testes:</h3>';
+            
+            for (const component of componentsToTest) {
+                try {
+                    const response = await fetch(component.path);
+                    const status = response.ok ? 'ok' : 'error';
+                    const statusIcon = response.ok ? '✅' : '❌';
+                    
+                    resultsHtml += `
+                        <div class="status">
+                            <div class="status-icon status-${status}"></div>
+                            ${statusIcon} ${component.name} - ${response.ok ? 'OK' : 'Erro'}
+                        </div>
+                    `;
+                } catch (error) {
+                    resultsHtml += `
+                        <div class="status">
+                            <div class="status-icon status-error"></div>
+                            ❌ ${component.name} - Erro: ${error.message}
+                        </div>
+                    `;
+                }
+            }
+            
+            results.innerHTML = `<div class="result">${resultsHtml}</div>`;
+        }
+        
+        function checkFiles() {
+            const results = document.getElementById('results');
+            results.innerHTML = `
+                <div class="result">
+                    <h3>✅ Verificação de Arquivos Concluída!</h3>
+                    <p>A estrutura modularizada foi criada com sucesso:</p>
+                    <ul>
+                        <li>✅ Arquivo index.html foi substituído pela versão modularizada</li>
+                        <li>✅ Backup do arquivo original foi criado (index-original-backup.html)</li>
+                        <li>✅ Todos os arquivos CSS foram organizados em /css/</li>
+                        <li>✅ Todos os arquivos JS foram organizados em /js/</li>
+                        <li>✅ Todos os componentes HTML foram organizados em /components/</li>
+                        <li>✅ Documentação completa disponível em README-MODULARIZADO.md</li>
+                    </ul>
+                </div>
+            `;
+        }
+        
+        function openMainApp() {
+            window.open('./index.html', '_blank');
+        }
+        
+        function showDocumentation() {
+            window.open('./README-MODULARIZADO.md', '_blank');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Index Principal</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste do Index Principal</h1>
+        
+        <div class="test-buttons">
+            <button class="btn btn-primary" onclick="testarFormulario()">
+                📝 Testar Formulário
+            </button>
+            <button class="btn btn-secondary" onclick="testarDashboard()">
+                📊 Testar Dashboard
+            </button>
+            <button class="btn btn-success" onclick="testarNavegacao()">
+                🧭 Testar Navegação
+            </button>
+        </div>
+        
+        <div id="resultado" class="card mt-3">
+            <div class="card-header">
+                <h2>Resultados dos Testes</h2>
+            </div>
+            <div id="resultado-content" class="card-body">
+                <p>Clique nos botões para testar...</p>
+            </div>
+        </div>
+        
+        <div id="log" class="card mt-3">
+            <div class="card-header">
+                <h2>Log de Testes</h2>
+            </div>
+            <div id="log-content" class="card-body" style="font-family: monospace; background: #f8f9fa; max-height: 300px; overflow-y: auto;">
+                Iniciando testes...<br>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const logContent = document.getElementById('log-content');
+        const resultContent = document.getElementById('resultado-content');
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logContent.innerHTML += `[${timestamp}] ${message}<br>`;
+            logContent.scrollTop = logContent.scrollHeight;
+            console.log(message);
+        }
+        
+        function testarFormulario() {
+            log('📝 Testando formulário...');
+            
+            // Verificar se elementos do formulário existem
+            const formulario = document.getElementById('formulario');
+            const form = document.getElementById('form-solicitacao');
+            const cliente = document.getElementById('cliente');
+            const servico = document.getElementById('servico');
+            
+            let elementos = [];
+            if (formulario) elementos.push('Container formulário');
+            if (form) elementos.push('Form element');
+            if (cliente) elementos.push('Campo cliente');
+            if (servico) elementos.push('Campo serviço');
+            
+            resultContent.innerHTML = `
+                <h3>✅ Teste do Formulário</h3>
+                <p><strong>Elementos encontrados:</strong> ${elementos.length}/4</p>
+                <ul>
+                    ${elementos.map(el => `<li>${el}</li>`).join('')}
+                </ul>
+                ${elementos.length === 4 ? '<p style="color: green;">✅ Formulário OK!</p>' : '<p style="color: red;">❌ Formulário com problemas</p>'}
+            `;
+            
+            log(`✅ Formulário testado: ${elementos.length}/4 elementos encontrados`);
+        }
+        
+        function testarDashboard() {
+            log('📊 Testando dashboard...');
+            
+            // Verificar se elementos do dashboard existem
+            const dashboard = document.getElementById('dashboard');
+            const kpiMes = document.getElementById('kpi-mes');
+            const ranking = document.getElementById('ranking-solicitantes');
+            const services = document.getElementById('services-chart');
+            const barAndamento = document.getElementById('bar-andamento');
+            
+            let elementos = [];
+            if (dashboard) elementos.push('Container dashboard');
+            if (kpiMes) elementos.push('KPI Mês');
+            if (ranking) elementos.push('Ranking Solicitantes');
+            if (services) elementos.push('Gráfico Serviços');
+            if (barAndamento) elementos.push('Barra Andamento');
+            
+            resultContent.innerHTML = `
+                <h3>✅ Teste do Dashboard</h3>
+                <p><strong>Elementos encontrados:</strong> ${elementos.length}/5</p>
+                <ul>
+                    ${elementos.map(el => `<li>${el}</li>`).join('')}
+                </ul>
+                ${elementos.length === 5 ? '<p style="color: green;">✅ Dashboard OK!</p>' : '<p style="color: red;">❌ Dashboard com problemas</p>'}
+            `;
+            
+            log(`✅ Dashboard testado: ${elementos.length}/5 elementos encontrados`);
+        }
+        
+        function testarNavegacao() {
+            log('🧭 Testando navegação...');
+            
+            // Verificar se botões de navegação existem
+            const navButtons = document.querySelectorAll('.nav-button');
+            const formularioBtn = navButtons[0];
+            const painelBtn = navButtons[1];
+            const dashboardBtn = navButtons[2];
+            
+            let elementos = [];
+            if (formularioBtn) elementos.push('Botão Formulário');
+            if (painelBtn) elementos.push('Botão Painel');
+            if (dashboardBtn) elementos.push('Botão Dashboard');
+            
+            // Verificar se páginas existem
+            const formularioPage = document.getElementById('formulario');
+            const painelPage = document.getElementById('painel');
+            const dashboardPage = document.getElementById('dashboard');
+            
+            if (formularioPage) elementos.push('Página Formulário');
+            if (painelPage) elementos.push('Página Painel');
+            if (dashboardPage) elementos.push('Página Dashboard');
+            
+            resultContent.innerHTML = `
+                <h3>✅ Teste da Navegação</h3>
+                <p><strong>Elementos encontrados:</strong> ${elementos.length}/6</p>
+                <ul>
+                    ${elementos.map(el => `<li>${el}</li>`).join('')}
+                </ul>
+                ${elementos.length === 6 ? '<p style="color: green;">✅ Navegação OK!</p>' : '<p style="color: red;">❌ Navegação com problemas</p>'}
+                
+                <h4>Teste de Clique:</h4>
+                <button class="btn btn-primary" onclick="testarClickDashboard()">
+                    📊 Testar Clique Dashboard
+                </button>
+            `;
+            
+            log(`✅ Navegação testada: ${elementos.length}/6 elementos encontrados`);
+        }
+        
+        function testarClickDashboard() {
+            log('🖱️ Testando clique no dashboard...');
+            
+            try {
+                // Simular clique no dashboard
+                if (typeof showDashboard === 'function') {
+                    showDashboard();
+                    log('✅ Função showDashboard executada');
+                    
+                    // Verificar se dashboard ficou visível
+                    setTimeout(() => {
+                        const dashboard = document.getElementById('dashboard');
+                        if (dashboard && !dashboard.classList.contains('d-none')) {
+                            log('✅ Dashboard está visível');
+                        } else {
+                            log('❌ Dashboard não está visível');
+                        }
+                    }, 500);
+                    
+                } else {
+                    log('❌ Função showDashboard não encontrada');
+                }
+            } catch (error) {
+                log(`❌ Erro ao testar clique: ${error.message}`);
+            }
+        }
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🚀 Página de teste carregada');
+            log('📋 Clique nos botões para executar os testes');
+        });
+    </script>
+    
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .test-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .mt-3 {
+            margin-top: 1rem;
+        }
+    </style>
+</body>
+</html>

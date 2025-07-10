@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Navegação - Sagacy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-10 offset-md-1">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">🧪 Teste de Navegação</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6>Testes de Navegação:</h6>
+                            <button class="btn btn-primary me-2" onclick="testarNavegacaoFormulario()">
+                                📝 Ir para Formulário
+                            </button>
+                            <button class="btn btn-success me-2" onclick="testarNavegacaoPainel()">
+                                📋 Ir para Painel
+                            </button>
+                            <button class="btn btn-info me-2" onclick="testarNavegacaoDashboard()">
+                                📊 Ir para Dashboard
+                            </button>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6>Teste de Envio + Navegação:</h6>
+                            <button class="btn btn-warning" onclick="simularEnvioFormulario()">
+                                🚀 Simular Envio e Navegação
+                            </button>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6>Estado das Páginas:</h6>
+                            <button class="btn btn-secondary" onclick="verificarEstadoPaginas()">
+                                🔍 Verificar Estado
+                            </button>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h6>Logs:</h6>
+                            <div id="logs" class="bg-light p-3 rounded" style="height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Função para adicionar logs
+        function addLog(type, message) {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${type}: ${message}`;
+            
+            const p = document.createElement('p');
+            p.className = type === 'ERROR' ? 'text-danger mb-1' : 'text-info mb-1';
+            p.textContent = logEntry;
+            
+            logsDiv.appendChild(p);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            
+            console.log(logEntry);
+        }
+        
+        // Função para verificar estado das páginas
+        function verificarEstadoPaginas() {
+            addLog('INFO', '🔍 Verificando estado das páginas...');
+            
+            const pages = ['formulario', 'painel', 'dashboard'];
+            const parentWindow = window.parent;
+            
+            pages.forEach(pageId => {
+                const page = parentWindow.document.getElementById(pageId);
+                if (page) {
+                    const computedStyle = parentWindow.getComputedStyle(page);
+                    addLog('INFO', `📄 ${pageId}: display=${computedStyle.display}, classes=${page.className}`);
+                } else {
+                    addLog('ERROR', `❌ Página ${pageId} não encontrada`);
+                }
+            });
+            
+            // Verificar botões de navegação
+            const buttons = parentWindow.document.querySelectorAll('.nav-button');
+            buttons.forEach((btn, index) => {
+                addLog('INFO', `🔘 Botão ${index}: ${btn.textContent.trim()} - Active: ${btn.classList.contains('active')}`);
+            });
+        }
+        
+        // Testes de navegação
+        function testarNavegacaoFormulario() {
+            addLog('INFO', '📝 Testando navegação para formulário...');
+            try {
+                if (window.parent.showFormulario) {
+                    window.parent.showFormulario();
+                    addLog('SUCCESS', '✅ Navegação para formulário executada');
+                } else {
+                    addLog('ERROR', '❌ Função showFormulario não encontrada');
+                }
+            } catch (error) {
+                addLog('ERROR', `❌ Erro na navegação: ${error.message}`);
+            }
+        }
+        
+        function testarNavegacaoPainel() {
+            addLog('INFO', '📋 Testando navegação para painel...');
+            try {
+                if (window.parent.showPainel) {
+                    window.parent.showPainel();
+                    addLog('SUCCESS', '✅ Navegação para painel executada');
+                } else {
+                    addLog('ERROR', '❌ Função showPainel não encontrada');
+                }
+            } catch (error) {
+                addLog('ERROR', `❌ Erro na navegação: ${error.message}`);
+            }
+        }
+        
+        function testarNavegacaoDashboard() {
+            addLog('INFO', '📊 Testando navegação para dashboard...');
+            try {
+                if (window.parent.showDashboard) {
+                    window.parent.showDashboard();
+                    addLog('SUCCESS', '✅ Navegação para dashboard executada');
+                } else {
+                    addLog('ERROR', '❌ Função showDashboard não encontrada');
+                }
+            } catch (error) {
+                addLog('ERROR', `❌ Erro na navegação: ${error.message}`);
+            }
+        }
+        
+        // Simular envio do formulário
+        function simularEnvioFormulario() {
+            addLog('INFO', '🚀 Simulando envio do formulário...');
+            
+            // Simular sucesso no envio
+            addLog('INFO', '✅ Simulando sucesso no envio...');
+            addLog('INFO', '⏳ Aguardando 2 segundos para navegação...');
+            
+            setTimeout(() => {
+                addLog('INFO', '🔄 Executando navegação para painel...');
+                try {
+                    if (window.parent.showPainel) {
+                        window.parent.showPainel();
+                        addLog('SUCCESS', '✅ Navegação simulada executada');
+                        
+                        // Verificar resultado após 500ms
+                        setTimeout(() => {
+                            verificarEstadoPaginas();
+                        }, 500);
+                    } else {
+                        addLog('ERROR', '❌ Função showPainel não encontrada');
+                    }
+                } catch (error) {
+                    addLog('ERROR', `❌ Erro na navegação simulada: ${error.message}`);
+                }
+            }, 2000);
+        }
+        
+        addLog('INFO', '🧪 Teste de navegação carregado');
+        
+        // Verificar estado inicial
+        setTimeout(() => {
+            verificarEstadoPaginas();
+        }, 1000);
+    </script>
+</body>
+</html>

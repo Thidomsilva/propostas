@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Navegação - Sagacy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button.active {
+            background: #28a745;
+        }
+        .page {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .d-none {
+            display: none !important;
+        }
+        .log {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Teste de Navegação</h1>
+        
+        <div class="nav-buttons">
+            <button class="nav-button active" onclick="showPage('formulario')">📝 Formulário</button>
+            <button class="nav-button" onclick="showPage('painel')">📋 Painel</button>
+            <button class="nav-button" onclick="showPage('dashboard')">📊 Dashboard</button>
+        </div>
+        
+        <div class="log" id="log">
+            Sistema iniciado. Aguardando teste de navegação...
+        </div>
+        
+        <div id="formulario" class="page">
+            <h2>📝 Página do Formulário</h2>
+            <p>Esta é a página do formulário de solicitações.</p>
+        </div>
+        
+        <div id="painel" class="page d-none">
+            <h2>📋 Página do Painel</h2>
+            <p>Esta é a página do painel de acompanhamento.</p>
+            <p>Aqui deveria aparecer a tabela com as solicitações.</p>
+        </div>
+        
+        <div id="dashboard" class="page d-none">
+            <h2>📊 Página do Dashboard</h2>
+            <p>Esta é a página do dashboard com estatísticas.</p>
+            <p>Aqui deveria aparecer gráficos e KPIs.</p>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <button onclick="testNavigation()">🧪 Teste Automático</button>
+            <button onclick="clearLog()">🗑️ Limpar Log</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 'formulario';
+        
+        function log(message) {
+            const logEl = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logEl.innerHTML += `\n[${timestamp}] ${message}`;
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(`[${timestamp}] ${message}`);
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = 'Log limpo. Aguardando ações...';
+        }
+        
+        function showPage(pageId) {
+            log(`🔄 Tentando mostrar página: ${pageId}`);
+            
+            // Esconder todas as páginas
+            const pages = document.querySelectorAll('.page');
+            log(`📋 Encontradas ${pages.length} páginas`);
+            
+            pages.forEach(page => {
+                page.classList.add('d-none');
+                log(`🔒 Escondido: ${page.id}`);
+            });
+            
+            // Remover active de todos os botões
+            const buttons = document.querySelectorAll('.nav-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Mostrar página selecionada
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.remove('d-none');
+                log(`✅ Página ${pageId} exibida`);
+                log(`📊 Classes após mudança: ${targetPage.className}`);
+            } else {
+                log(`❌ Página ${pageId} não encontrada`);
+                return;
+            }
+            
+            // Ativar botão correspondente
+            const buttonIndex = ['formulario', 'painel', 'dashboard'].indexOf(pageId);
+            if (buttonIndex >= 0 && buttons[buttonIndex]) {
+                buttons[buttonIndex].classList.add('active');
+                log(`✅ Botão ${pageId} ativado`);
+            }
+            
+            currentPage = pageId;
+            log(`📱 Página atual: ${currentPage}`);
+        }
+        
+        function testNavigation() {
+            log('🧪 Iniciando teste automático...');
+            
+            setTimeout(() => {
+                log('📋 Testando navegação para painel...');
+                showPage('painel');
+            }, 1000);
+            
+            setTimeout(() => {
+                log('📊 Testando navegação para dashboard...');
+                showPage('dashboard');
+            }, 2000);
+            
+            setTimeout(() => {
+                log('📝 Voltando para formulário...');
+                showPage('formulario');
+            }, 3000);
+            
+            setTimeout(() => {
+                log('🎉 Teste automático concluído!');
+            }, 4000);
+        }
+        
+        // Log inicial
+        log('🚀 Sistema de teste carregado');
+        log(`📱 Página inicial: ${currentPage}`);
+    </script>
+</body>
+</html>

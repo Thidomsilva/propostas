@@ -1,0 +1,38 @@
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Painel de Acompanhamento</h2>
+        <p class="card-subtitle">Visualize e gerencie todas as solicitações de propostas</p>
+    </div>
+    
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <button class="btn btn-primary" onclick="loadSolicitacoes()">
+            🔄 Atualizar Lista
+        </button>
+        <button class="btn btn-secondary" onclick="exportarDados()">
+            📥 Exportar CSV
+        </button>
+    </div>
+    
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Solicitante</th>
+                    <th>Cliente</th>
+                    <th>Projeto</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-solicitacoes">
+                <tr>
+                    <td colspan="7" class="text-center text-muted">
+                        Carregue os dados para visualizar as solicitações
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,598 @@
+/* === DASHBOARD OTIMIZADO === */
+
+/* Performance Grid */
+.performance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.performance-card {
+    background: var(--cardBg);
+    border-radius: var(--borderRadius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.performance-card:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+/* Status Distribution */
+.status-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.status-item {
+    display: grid;
+    grid-template-columns: 120px 1fr 60px;
+    align-items: center;
+    gap: 1rem;
+}
+
+.status-label {
+    font-weight: 500;
+    color: var(--textPrimary);
+}
+
+.status-bar-container {
+    background: var(--bgSecondary);
+    height: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.status-bar {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.8s ease;
+    position: relative;
+}
+
+.status-bar.status-andamento {
+    background: linear-gradient(90deg, #17a2b8, #0ea5e9);
+}
+
+.status-bar.status-finalizado {
+    background: linear-gradient(90deg, #28a745, #10b981);
+}
+
+.status-bar.status-aberto {
+    background: linear-gradient(90deg, #ffc107, #f59e0b);
+}
+
+.status-percent {
+    font-weight: 600;
+    color: var(--textPrimary);
+    text-align: right;
+}
+
+/* Services Chart */
+.services-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.service-item {
+    display: grid;
+    grid-template-columns: 1fr 80px 60px;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: var(--bgSecondary);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.service-item:hover {
+    background: var(--border);
+    transform: translateX(2px);
+}
+
+.service-name {
+    font-weight: 500;
+    color: var(--textPrimary);
+}
+
+.service-bar-container {
+    background: var(--border);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.service-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 4px;
+    transition: width 0.6s ease;
+}
+
+.service-count {
+    font-weight: 600;
+    color: var(--textSecondary);
+    text-align: right;
+}
+
+/* Insights Grid */
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.insight-card {
+    background: var(--cardBg);
+    border-radius: var(--borderRadius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.insight-card:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+/* Rankings */
+.ranking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ranking-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bgSecondary);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.ranking-item:hover {
+    background: var(--border);
+    transform: translateX(3px);
+}
+
+.ranking-badge {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: 700;
+}
+
+.ranking-badge.first {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+}
+
+.ranking-badge.second {
+    background: linear-gradient(135deg, #c0c0c0, #e5e7eb);
+}
+
+.ranking-badge.third {
+    background: linear-gradient(135deg, #cd7f32, #92400e);
+}
+
+.ranking-badge.other {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.ranking-info {
+    flex: 1;
+}
+
+.ranking-name {
+    font-weight: 600;
+    color: var(--textPrimary);
+    margin-bottom: 0.25rem;
+}
+
+.ranking-stats {
+    font-size: 0.875rem;
+    color: var(--textSecondary);
+}
+
+.ranking-count {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* Monthly Chart */
+.monthly-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.monthly-item {
+    display: grid;
+    grid-template-columns: 80px 1fr 50px;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: var(--bgSecondary);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.monthly-item:hover {
+    background: var(--border);
+}
+
+.monthly-label {
+    font-weight: 500;
+    color: var(--textPrimary);
+}
+
+.monthly-bar-container {
+    background: var(--border);
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.monthly-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--primary));
+    border-radius: 6px;
+    transition: width 0.8s ease;
+}
+
+.monthly-count {
+    font-weight: 600;
+    color: var(--textSecondary);
+    text-align: right;
+}
+
+/* Dashboard Controls */
+.dashboard-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    padding: 1rem;
+    background: var(--bgSecondary);
+    border-radius: var(--borderRadius);
+}
+
+/* Last Refresh Timestamp */
+.last-refresh {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+/* Loading Messages */
+.loading-message {
+    text-align: center;
+    color: var(--textMuted);
+    padding: 2rem;
+    font-style: italic;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--cardBg);
+    border-radius: var(--borderRadius);
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: var(--textSecondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* KPI Trends */
+.kpi-trend {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.kpi-trend.positive {
+    color: #10b981;
+}
+
+.kpi-trend.negative {
+    color: #ef4444;
+}
+
+.kpi-trend.neutral {
+    color: #6b7280;
+}
+
+.kpi-trend span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* KPI Modal */
+.kpi-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.kpi-modal-content {
+    background: var(--cardBg);
+    border-radius: var(--borderRadius);
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.kpi-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.kpi-modal-header h3 {
+    margin: 0;
+    color: var(--textPrimary);
+}
+
+.kpi-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--textSecondary);
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.kpi-modal-close:hover {
+    background: var(--bgSecondary);
+    color: var(--textPrimary);
+}
+
+.kpi-modal-body {
+    padding: 1.5rem;
+}
+
+.monthly-details,
+.time-details,
+.rate-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.monthly-detail-item,
+.time-detail-item,
+.rate-detail-item {
+    padding: 1rem;
+    background: var(--bgSecondary);
+    border-radius: 8px;
+    border-left: 4px solid var(--primary);
+}
+
+.monthly-detail-item small,
+.time-detail-item small {
+    display: block;
+    color: var(--textSecondary);
+    margin-top: 0.25rem;
+}
+
+.rate-summary {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--primary);
+    color: white;
+    border-radius: 8px;
+    text-align: center;
+}
+
+/* === RESPONSIVE DASHBOARD === */
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .dashboard-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .dashboard-actions {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .painel-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .painel-actions {
+        width: 100%;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .performance-grid,
+    .insights-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .status-item,
+    .service-item,
+    .monthly-item {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 0.5rem;
+    }
+    
+    .dashboard-content {
+        gap: 1.5rem;
+    }
+    
+    .dashboard-section h3 {
+        font-size: 1.2rem;
+    }
+    
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .kpi-card {
+        text-align: center;
+    }
+    
+    .kpi-trend {
+        justify-content: center;
+    }
+    
+    .dashboard-controls {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .dashboard-controls .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-header h2 {
+        font-size: 1.25rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 1.75rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+    
+    .performance-card,
+    .insight-card {
+        padding: 1rem;
+    }
+    
+    .ranking-item {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .ranking-badge {
+        width: 35px;
+        height: 35px;
+        font-size: 1.1rem;
+    }
+    
+    .dashboard-section h3 {
+        font-size: 1.1rem;
+    }
+    
+    .table-container table {
+        font-size: 0.8rem;
+    }
+    
+    .table-container th,
+    .table-container td {
+        padding: 0.5rem 0.25rem;
+    }
+}
+
+/* KPI Cards Hover Effects */
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.kpi-card[style*="cursor: pointer"]:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.kpi-card[style*="cursor: pointer"]:hover .kpi-icon {
+    transform: scale(1.1);
+}
+
+.kpi-card[style*="cursor: pointer"]:hover .kpi-trend {
+    opacity: 0.9;
+}
+
+.kpi-card[style*="cursor: pointer"]:hover .kpi-label {
+    opacity: 0.9;
+}
+
+.kpi-card[style*="cursor: pointer"]:hover .kpi-number {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}

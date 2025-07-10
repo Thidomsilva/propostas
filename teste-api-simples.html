@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Simples API - Sagacy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">🔧 Teste Simples da API</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <button class="btn btn-primary" onclick="testarAPISimples()">
+                                🧪 Testar API
+                            </button>
+                            <button class="btn btn-success" onclick="testarPainelSimples()">
+                                📋 Testar Painel
+                            </button>
+                        </div>
+                        
+                        <div id="resultado" class="mt-3"></div>
+                        
+                        <div class="mt-4">
+                            <h6>Logs:</h6>
+                            <div id="logs" class="bg-light p-3 rounded" style="height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Configuração da API
+        const API_URL = 'https://script.google.com/macros/s/AKfycbw-jMfWF5F7I_1kRUddL7ou7Y6JtJeDs271CV2sT1mOwcLEUESy3oOkGDMl7eA4b6kiBw/exec';
+        
+        // Função para adicionar logs
+        function addLog(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            
+            const p = document.createElement('p');
+            p.className = type === 'error' ? 'text-danger mb-1' : 'text-info mb-1';
+            p.textContent = logEntry;
+            
+            logsDiv.appendChild(p);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            
+            // Também mostrar no console
+            console.log(logEntry);
+        }
+        
+        // Função para mostrar resultado
+        function showResult(message, type = 'info') {
+            const resultDiv = document.getElementById('resultado');
+            const alertClass = type === 'error' ? 'alert-danger' : type === 'success' ? 'alert-success' : 'alert-info';
+            resultDiv.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+        }
+        
+        // Teste simples da API
+        async function testarAPISimples() {
+            addLog('🔄 Iniciando teste simples da API...');
+            showResult('Testando...', 'info');
+            
+            try {
+                // Teste com GET simples
+                const url = `${API_URL}?action=listar&_=${Date.now()}`;
+                addLog(`📡 Fazendo GET para: ${url}`);
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    headers: {
+                        'Accept': 'application/json,text/plain,*/*'
+                    }
+                });
+                
+                addLog(`📥 Status da resposta: ${response.status}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const text = await response.text();
+                addLog(`📄 Resposta (primeiros 200 chars): ${text.substring(0, 200)}`);
+                
+                // Tentar processar JSON
+                let data;
+                try {
+                    // Limpar resposta se necessário
+                    let cleanText = text.trim();
+                    
+                    // Remover wrapper JSONP se existir
+                    if (cleanText.startsWith('corsCallback(') && cleanText.endsWith(');')) {
+                        cleanText = cleanText.slice(13, -2);
+                        addLog('🔧 Removido wrapper JSONP');
+                    }
+                    
+                    data = JSON.parse(cleanText);
+                    addLog('✅ JSON parseado com sucesso');
+                    
+                } catch (parseError) {
+                    addLog(`⚠️ Erro ao parsear JSON: ${parseError.message}`, 'error');
+                    throw parseError;
+                }
+                
+                addLog(`📊 Dados recebidos: ${JSON.stringify(data, null, 2)}`);
+                
+                // Verificar tanto success quanto sucesso
+                const isSuccess = data.success || data.sucesso;
+                
+                if (isSuccess) {
+                    const qtdDados = data.dados ? data.dados.length : 0;
+                    showResult(`✅ API funcionando! Recebidos ${qtdDados} registros`, 'success');
+                    addLog(`✅ Teste concluído com sucesso - ${qtdDados} registros`);
+                } else {
+                    showResult(`⚠️ API respondeu mas com erro: ${data.mensagem || data.message || 'Erro desconhecido'}`, 'error');
+                    addLog(`⚠️ API retornou erro: ${data.mensagem || data.message}`, 'error');
+                }
+                
+            } catch (error) {
+                addLog(`❌ Erro no teste: ${error.message}`, 'error');
+                showResult(`❌ Erro: ${error.message}`, 'error');
+            }
+        }
+        
+        // Teste do painel
+        async function testarPainelSimples() {
+            addLog('📋 Iniciando teste do painel...');
+            showResult('Testando painel...', 'info');
+            
+            try {
+                // Simular carregamento do painel
+                const response = await fetch(`${API_URL}?action=listar&_=${Date.now()}`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache'
+                });
+                
+                const text = await response.text();
+                let cleanText = text.trim();
+                
+                // Remover wrapper JSONP se existir
+                if (cleanText.startsWith('corsCallback(') && cleanText.endsWith(');')) {
+                    cleanText = cleanText.slice(13, -2);
+                }
+                
+                const data = JSON.parse(cleanText);
+                
+                // Testar estrutura esperada pelo painel
+                const dados = data?.data || data?.dados || [];
+                const isSuccess = data?.success || data?.sucesso || false;
+                
+                addLog(`📊 Estrutura da resposta:`);
+                addLog(`  - success: ${data.success || 'undefined'}`);
+                addLog(`  - sucesso: ${data.sucesso || 'undefined'}`);
+                addLog(`  - Success final: ${isSuccess}`);
+                addLog(`  - data: ${data.data ? 'presente' : 'ausente'}`);
+                addLog(`  - dados: ${data.dados ? 'presente' : 'ausente'}`);
+                addLog(`  - Array extraído: ${Array.isArray(dados) ? dados.length + ' itens' : 'não é array'}`);
+                
+                if (isSuccess && Array.isArray(dados)) {
+                    showResult(`✅ Painel OK! Compatível com ${dados.length} solicitações`, 'success');
+                    addLog(`✅ Painel compatível - dados encontrados`);
+                    
+                    // Mostrar primeiro item se existir
+                    if (dados.length > 0) {
+                        addLog(`📋 Primeiro item: ${JSON.stringify(dados[0], null, 2)}`);
+                    }
+                    
+                } else {
+                    showResult(`⚠️ Painel pode ter problemas - dados não encontrados`, 'error');
+                    addLog(`⚠️ Problemas na estrutura de dados do painel`, 'error');
+                }
+                
+            } catch (error) {
+                addLog(`❌ Erro no teste do painel: ${error.message}`, 'error');
+                showResult(`❌ Erro no painel: ${error.message}`, 'error');
+            }
+        }
+        
+        addLog('🚀 Teste simples carregado e pronto');
+    </script>
+</body>
+</html>

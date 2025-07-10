@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Simples - Sagacy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #1565c0;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background: #f0f0f0;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .url-test {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste Simples - API Sagacy</h1>
+    
+    <div class="test-card">
+        <h2>📋 Instruções</h2>
+        <p><strong>Este teste vai verificar se o Google Apps Script está funcionando corretamente.</strong></p>
+        <p>Teste na seguinte ordem:</p>
+        <ol>
+            <li>Clique em "Testar URL Diretamente" primeiro</li>
+            <li>Se funcionar, clique em "Testar via JavaScript"</li>
+            <li>Se der erro CORS, o problema é a configuração do script</li>
+        </ol>
+    </div>
+
+    <div class="test-card">
+        <h2>🔗 Teste 1: URL Direta</h2>
+        <p>Teste a URL diretamente no navegador:</p>
+        <div class="url-test">
+            <strong>URL:</strong><br>
+            <a href="https://script.google.com/macros/s/AKfycbxVCWzcndMowKoIjUaFqFFJ3jPABhrLvjco8G8XupUU-wfhgLFa2v7M9K1Ith-NTy6XVg/exec?action=listar" target="_blank">
+                https://script.google.com/macros/s/AKfycbxVCWzcndMowKoIjUaFqFFJ3jPABhrLvjco8G8XupUU-wfhgLFa2v7M9K1Ith-NTy6XVg/exec?action=listar
+            </a>
+        </div>
+        <p><strong>Resultado esperado:</strong> Deve mostrar JSON com dados</p>
+        <p><strong>Se não funcionar:</strong> O Google Apps Script não foi publicado corretamente</p>
+    </div>
+
+    <div class="test-card">
+        <h2>🔌 Teste 2: Via JavaScript</h2>
+        <button class="test-button" onclick="testarAPI()">Testar API via JavaScript</button>
+        <div id="api-result" class="result"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>📝 Teste 3: Criar Solicitação</h2>
+        <button class="test-button" onclick="testarCriacao()">Testar Criação de Solicitação</button>
+        <div id="create-result" class="result"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>📧 Teste 4: E-mail</h2>
+        <button class="test-button" onclick="testarEmail()">Testar E-mail</button>
+        <div id="email-result" class="result"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>🔧 Diagnóstico</h2>
+        <div id="diagnostico">
+            <p><strong>Status:</strong> Aguardando testes...</p>
+            <ul id="diagnostico-list">
+                <li>❓ URL direta: Não testada</li>
+                <li>❓ API JavaScript: Não testada</li>
+                <li>❓ Criação: Não testada</li>
+                <li>❓ E-mail: Não testado</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxVCWzcndMowKoIjUaFqFFJ3jPABhrLvjco8G8XupUU-wfhgLFa2v7M9K1Ith-NTy6XVg/exec';
+        
+        // Função para atualizar diagnóstico
+        function atualizarDiagnostico(teste, status) {
+            const lista = document.getElementById('diagnostico-list');
+            const itens = lista.getElementsByTagName('li');
+            
+            for (let item of itens) {
+                if (item.textContent.includes(teste)) {
+                    const emoji = status === 'success' ? '✅' : status === 'error' ? '❌' : '⚠️';
+                    item.innerHTML = item.innerHTML.replace(/[❓✅❌⚠️]/, emoji);
+                }
+            }
+        }
+        
+        // Teste 1: API básica
+        async function testarAPI() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = '🔄 Testando API...';
+            
+            try {
+                console.log('🧪 Testando API...');
+                
+                // Usar método GET simples
+                const response = await fetch(API_URL + '?action=listar&_=' + Date.now(), {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('📡 Response status:', response.status);
+                console.log('📡 Response headers:', response.headers);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                console.log('📊 Dados recebidos:', data);
+                
+                if (data.sucesso) {
+                    resultDiv.innerHTML = '✅ API funcionando!\n\n' + JSON.stringify(data, null, 2);
+                    resultDiv.className = 'result success';
+                    atualizarDiagnostico('API JavaScript', 'success');
+                } else {
+                    resultDiv.innerHTML = '⚠️ API retornou erro:\n\n' + JSON.stringify(data, null, 2);
+                    resultDiv.className = 'result error';
+                    atualizarDiagnostico('API JavaScript', 'error');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                
+                let mensagem = '❌ Erro ao conectar com a API:\n\n';
+                mensagem += `Erro: ${error.message}\n`;
+                
+                if (error.message.includes('CORS')) {
+                    mensagem += '\n🔧 SOLUÇÃO:\n';
+                    mensagem += '1. Acesse https://script.google.com\n';
+                    mensagem += '2. Substitua o código pelo arquivo GOOGLE-SCRIPT-CORS-CORRIGIDO.js\n';
+                    mensagem += '3. Salve e republique como Web App\n';
+                    mensagem += '4. Certifique-se de que "Qualquer pessoa" tem acesso';
+                } else if (error.message.includes('Failed to fetch')) {
+                    mensagem += '\n🔧 POSSÍVEIS CAUSAS:\n';
+                    mensagem += '1. Script não publicado corretamente\n';
+                    mensagem += '2. URL incorreta\n';
+                    mensagem += '3. Problemas de rede';
+                }
+                
+                resultDiv.innerHTML = mensagem;
+                resultDiv.className = 'result error';
+                atualizarDiagnostico('API JavaScript', 'error');
+            }
+        }
+        
+        // Teste 2: Criar solicitação
+        async function testarCriacao() {
+            const resultDiv = document.getElementById('create-result');
+            resultDiv.innerHTML = '🔄 Testando criação...';
+            
+            try {
+                const dados = {
+                    action: 'criar',
+                    cliente: 'Teste Cliente',
+                    servico: 'Teste de Sistema',
+                    solicitante: 'Sistema de Teste',
+                    descricao: 'Teste de criação de solicitação - ' + new Date().toLocaleString('pt-BR')
+                };
+                
+                console.log('📝 Enviando dados:', dados);
+                
+                // Tentar GET primeiro (mais simples)
+                const url = API_URL + '?' + new URLSearchParams(dados);
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.sucesso) {
+                    resultDiv.innerHTML = '✅ Solicitação criada com sucesso!\n\n' + JSON.stringify(data, null, 2);
+                    resultDiv.className = 'result success';
+                    atualizarDiagnostico('Criação', 'success');
+                } else {
+                    resultDiv.innerHTML = '❌ Erro ao criar:\n\n' + JSON.stringify(data, null, 2);
+                    resultDiv.className = 'result error';
+                    atualizarDiagnostico('Criação', 'error');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                resultDiv.innerHTML = '❌ Erro ao criar solicitação:\n\n' + error.message;
+                resultDiv.className = 'result error';
+                atualizarDiagnostico('Criação', 'error');
+            }
+        }
+        
+        // Teste 3: E-mail
+        async function testarEmail() {
+            const resultDiv = document.getElementById('email-result');
+            resultDiv.innerHTML = '🔄 Testando e-mail...';
+            
+            try {
+                const response = await fetch(API_URL + '?action=teste_email&_=' + Date.now());
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.sucesso) {
+                    resultDiv.innerHTML = '✅ Teste de e-mail executado!\n\n' + JSON.stringify(data, null, 2);
+                    resultDiv.className = 'result success';
+                    atualizarDiagnostico('E-mail', 'success');
+                } else {
+                    resultDiv.innerHTML = '❌ Erro no teste:\n\n' + JSON.stringify(data, null, 2);
+                    resultDiv.className = 'result error';
+                    atualizarDiagnostico('E-mail', 'error');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                resultDiv.innerHTML = '❌ Erro no teste de e-mail:\n\n' + error.message;
+                resultDiv.className = 'result error';
+                atualizarDiagnostico('E-mail', 'error');
+            }
+        }
+        
+        // Verificar se consegue acessar a URL diretamente
+        window.addEventListener('load', function() {
+            console.log('🔍 Verificando se o script está online...');
+            
+            // Teste simples de conectividade
+            fetch(API_URL + '?action=listar&_=' + Date.now())
+                .then(response => {
+                    if (response.ok) {
+                        atualizarDiagnostico('URL direta', 'success');
+                        console.log('✅ Script acessível via URL direta');
+                    } else {
+                        atualizarDiagnostico('URL direta', 'error');
+                        console.log('❌ Script não acessível via URL direta');
+                    }
+                })
+                .catch(error => {
+                    atualizarDiagnostico('URL direta', 'error');
+                    console.log('❌ Erro ao acessar URL direta:', error);
+                });
+        });
+    </script>
+</body>
+</html>

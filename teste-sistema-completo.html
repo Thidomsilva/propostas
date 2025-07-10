@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Sistema Sagacy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #1565c0;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background: #f0f0f0;
+            white-space: pre-wrap;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 80px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Sistema de Teste - Sagacy</h1>
+    
+    <!-- Teste de API -->
+    <div class="test-section">
+        <h2>🔌 Teste de API</h2>
+        <p>Vamos testar se a API está funcionando corretamente.</p>
+        
+        <button class="test-button" onclick="testarAPI()">Testar API</button>
+        <button class="test-button" onclick="listarSolicitacoes()">Listar Solicitações</button>
+        
+        <div id="api-result" class="result"></div>
+    </div>
+
+    <!-- Teste de Formulário -->
+    <div class="test-section">
+        <h2>📝 Teste de Formulário</h2>
+        <p>Teste de criação de solicitação com e-mail automático.</p>
+        
+        <form id="form-teste" onsubmit="criarSolicitacao(event)">
+            <div class="form-group">
+                <label for="cliente">Cliente:</label>
+                <input type="text" id="cliente" name="cliente" value="Teste Cliente" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="servico">Serviço:</label>
+                <select id="servico" name="servico" required>
+                    <option value="">Selecione...</option>
+                    <option value="Business Plan">Business Plan</option>
+                    <option value="Consultoria">Consultoria</option>
+                    <option value="Desenvolvimento Web">Desenvolvimento Web</option>
+                    <option value="Auditoria Externa">Auditoria Externa</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="solicitante">Solicitante:</label>
+                <select id="solicitante" name="solicitante" required>
+                    <option value="">Selecione...</option>
+                    <option value="Thiago">Thiago</option>
+                    <option value="Marcos">Marcos</option>
+                    <option value="Milena">Milena</option>
+                    <option value="Victor">Victor</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="descricao">Descrição:</label>
+                <textarea id="descricao" name="descricao" required>Teste de sistema - envio de e-mail automático</textarea>
+            </div>
+            
+            <button type="submit" class="test-button">Enviar Solicitação (com E-mail)</button>
+        </form>
+        
+        <div id="form-result" class="result"></div>
+    </div>
+
+    <!-- Teste de E-mail -->
+    <div class="test-section">
+        <h2>📧 Teste de E-mail</h2>
+        <p>Teste direto do sistema de e-mail.</p>
+        
+        <button class="test-button" onclick="testarEmail()">Testar E-mail Direto</button>
+        
+        <div id="email-result" class="result"></div>
+    </div>
+
+    <!-- Dashboard Test -->
+    <div class="test-section">
+        <h2>📊 Teste de Dashboard</h2>
+        <p>Teste das funcionalidades do dashboard.</p>
+        
+        <button class="test-button" onclick="carregarDashboard()">Carregar Dashboard</button>
+        
+        <div id="dashboard-result" class="result"></div>
+    </div>
+
+    <script>
+        // === CONFIGURAÇÃO ===
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxVCWzcndMowKoIjUaFqFFJ3jPABhrLvjco8G8XupUU-wfhgLFa2v7M9K1Ith-NTy6XVg/exec';
+        
+        // === FUNÇÕES DE TESTE ===
+        
+        async function testarAPI() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = '🔄 Testando API...';
+            
+            try {
+                console.log('🧪 Testando API...');
+                
+                const response = await fetch(API_URL + '?action=listar&_=' + Date.now());
+                const data = await response.json();
+                
+                console.log('📡 Resposta da API:', data);
+                
+                if (data.sucesso) {
+                    resultDiv.innerHTML = '✅ API funcionando!\n\n' + JSON.stringify(data, null, 2);
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = '❌ API retornou erro:\n\n' + JSON.stringify(data, null, 2);
+                    resultDiv.className = 'result error';
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao testar API:', error);
+                resultDiv.innerHTML = '❌ Erro ao conectar com a API:\n\n' + error.message;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function listarSolicitacoes() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = '🔄 Carregando solicitações...';
+            
+            try {
+                const response = await fetch(API_URL + '?action=listar&_=' + Date.now());
+                const data = await response.json();
+                
+                if (data.sucesso) {
+                    resultDiv.innerHTML = '✅ Solicitações carregadas:\n\n' + JSON.stringify(data.dados, null, 2);
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = '❌ Erro ao carregar:\n\n' + data.mensagem;
+                    resultDiv.className = 'result error';
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Erro:\n\n' + error.message;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function criarSolicitacao(event) {
+            event.preventDefault();
+            
+            const resultDiv = document.getElementById('form-result');
+            resultDiv.innerHTML = '🔄 Enviando solicitação...';
+            
+            try {
+                const formData = new FormData(event.target);
+                const dados = {
+                    cliente: formData.get('cliente'),
+                    servico: formData.get('servico'),
+                    solicitante: formData.get('solicitante'),
+                    descricao: formData.get('descricao')
+                };
+                
+                console.log('📝 Dados da solicitação:', dados);
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'criar',
+                        ...dados
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.sucesso) {
+                    resultDiv.innerHTML = '✅ Solicitação criada com sucesso!\n\n' + JSON.stringify(data, null, 2);
+                    resultDiv.className = 'result success';
+                    
+                    // Limpar formulário
+                    event.target.reset();
+                    
+                } else {
+                    resultDiv.innerHTML = '❌ Erro ao criar solicitação:\n\n' + data.mensagem;
+                    resultDiv.className = 'result error';
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                resultDiv.innerHTML = '❌ Erro ao enviar:\n\n' + error.message;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function testarEmail() {
+            const resultDiv = document.getElementById('email-result');
+            resultDiv.innerHTML = '🔄 Testando e-mail...';
+            
+            try {
+                const response = await fetch(API_URL + '?action=teste_email&_=' + Date.now());
+                const data = await response.json();
+                
+                if (data.sucesso) {
+                    resultDiv.innerHTML = '✅ Teste de e-mail executado!\n\n' + JSON.stringify(data, null, 2);
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = '❌ Erro no teste:\n\n' + data.mensagem;
+                    resultDiv.className = 'result error';
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Erro:\n\n' + error.message;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function carregarDashboard() {
+            const resultDiv = document.getElementById('dashboard-result');
+            resultDiv.innerHTML = '🔄 Carregando dados do dashboard...';
+            
+            try {
+                const response = await fetch(API_URL + '?action=listar&_=' + Date.now());
+                const data = await response.json();
+                
+                if (data.sucesso) {
+                    const solicitacoes = data.dados || [];
+                    
+                    // Calcular estatísticas
+                    const stats = {
+                        total: solicitacoes.length,
+                        thisMonth: solicitacoes.filter(s => {
+                            const dataS = new Date(s.data);
+                            const now = new Date();
+                            return dataS.getMonth() === now.getMonth() && dataS.getFullYear() === now.getFullYear();
+                        }).length,
+                        finalizadas: solicitacoes.filter(s => s.status === 'Finalizada').length,
+                        pendentes: solicitacoes.filter(s => s.status === 'Pendente').length
+                    };
+                    
+                    resultDiv.innerHTML = '✅ Dashboard carregado!\n\n' + JSON.stringify(stats, null, 2);
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = '❌ Erro ao carregar dashboard:\n\n' + data.mensagem;
+                    resultDiv.className = 'result error';
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Erro:\n\n' + error.message;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Dashboard Otimizado</h2>
+        <p class="card-subtitle">Visão geral do desempenho e métricas do sistema</p>
+        <div class="last-refresh" id="last-refresh">Carregando...</div>
+    </div>
+    
+    <!-- KPIs Principais -->
+    <div class="kpi-grid">
+        <div class="kpi-card" onclick="showKPIDetails('mes')" style="cursor: pointer;">
+            <div class="kpi-icon">📈</div>
+            <div class="kpi-content">
+                <div class="kpi-number" id="kpi-mes">0</div>
+                <div class="kpi-label">Solicitações este Mês</div>
+                <div class="kpi-trend" id="kpi-mes-trend">-</div>
+            </div>
+        </div>
+        
+        <div class="kpi-card" onclick="showKPIDetails('tempo')" style="cursor: pointer;">
+            <div class="kpi-icon">⏱️</div>
+            <div class="kpi-content">
+                <div class="kpi-number" id="kpi-tempo">-</div>
+                <div class="kpi-label">Tempo Médio de Resposta</div>
+                <div class="kpi-trend" id="kpi-tempo-trend">-</div>
+            </div>
+        </div>
+        
+        <div class="kpi-card" onclick="showKPIDetails('taxa')" style="cursor: pointer;">
+            <div class="kpi-icon">✅</div>
+            <div class="kpi-content">
+                <div class="kpi-number" id="kpi-taxa">0%</div>
+                <div class="kpi-label">Taxa de Finalização</div>
+                <div class="kpi-trend" id="kpi-taxa-trend">-</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Performance Cards -->
+    <div class="performance-grid">
+        <!-- Distribuição por Status -->
+        <div class="performance-card">
+            <h3 class="card-title">Distribuição por Status</h3>
+            <div class="status-chart">
+                <div class="status-item">
+                    <div class="status-label">Em Andamento</div>
+                    <div class="status-bar-container">
+                        <div class="status-bar status-andamento" id="bar-andamento" style="width: 0%"></div>
+                    </div>
+                    <div class="status-percent" id="percent-andamento">0%</div>
+                </div>
+                
+                <div class="status-item">
+                    <div class="status-label">Finalizado</div>
+                    <div class="status-bar-container">
+                        <div class="status-bar status-finalizado" id="bar-finalizado" style="width: 0%"></div>
+                    </div>
+                    <div class="status-percent" id="percent-finalizado">0%</div>
+                </div>
+                
+                <div class="status-item">
+                    <div class="status-label">Aberto</div>
+                    <div class="status-bar-container">
+                        <div class="status-bar status-aberto" id="bar-aberto" style="width: 0%"></div>
+                    </div>
+                    <div class="status-percent" id="percent-aberto">0%</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Serviços Mais Solicitados -->
+        <div class="performance-card">
+            <h3 class="card-title">Projetos Mais Solicitados</h3>
+            <div class="services-chart" id="services-chart">
+                <div class="loading-message">Carregando dados...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Insights Grid -->
+    <div class="insights-grid">
+        <!-- Ranking de Solicitantes -->
+        <div class="insight-card">
+            <h3 class="card-title">Top Solicitantes</h3>
+            <div class="ranking-list" id="ranking-solicitantes">
+                <div class="loading-message">Carregando ranking...</div>
+            </div>
+        </div>
+        
+        <!-- Volume Mensal -->
+        <div class="insight-card">
+            <h3 class="card-title">Volume Mensal (Últimos 6 Meses)</h3>
+            <div class="monthly-chart" id="monthly-chart">
+                <div class="loading-message">Carregando dados mensais...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dashboard Controls -->
+    <div class="dashboard-controls">
+        <button class="btn btn-primary" onclick="loadDashboardData()">
+            🔄 Atualizar Dashboard
+        </button>
+        <button class="btn btn-secondary" onclick="exportarRelatorio()">
+            📊 Exportar Relatório
+        </button>
+        <button class="btn btn-secondary" onclick="testarAPI()">
+            🧪 Testar API
+        </button>
+    </div>
+</div>

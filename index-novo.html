@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sagacy - Gestão de Propostas Comerciais</title>
+    
+    <!-- CSS Modularizado -->
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/dashboard.css">
+</head>
+
+<body>
+    <div class="App">
+        <!-- Loading Spinner -->
+        <div id="loading" class="loading-container">
+            <div class="loading-spinner"></div>
+        </div>
+
+        <!-- Header -->
+        <header class="header">
+            <!-- Conteúdo do header será carregado via JS -->
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Navigation será injetada pelo header.html -->
+            
+            <!-- Dashboard -->
+            <div id="dashboard" class="page d-none">
+                <!-- Conteúdo do dashboard será carregado via JS -->
+            </div>
+
+            <!-- Formulário -->
+            <div id="formulario" class="page">
+                <!-- Conteúdo do formulário será carregado via JS -->
+            </div>
+
+            <!-- Painel de Acompanhamento -->
+            <div id="painel" class="page d-none">
+                <!-- Conteúdo do painel será carregado via JS -->
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p style="font-size: 0.9rem; opacity: 0.8;">Desenvolvido por: thiago@sagacy.com.br</p>
+            </div>
+        </footer>
+
+        <!-- Toast Container -->
+        <div id="toast-container" class="toast-container"></div>
+
+        <!-- Debug Info -->
+        <div id="debug-info" class="debug-info">
+            <div>Debug Mode: ON</div>
+            <div id="debug-last-action">-</div>
+            <div id="debug-api-status">API: Não testada</div>
+        </div>
+    </div>
+
+    <!-- JavaScript Modularizado -->
+    <script src="./js/main.js"></script>
+    <script src="./js/api.js"></script>
+    <script src="./js/formulario.js"></script>
+    <script src="./js/painel.js"></script>
+    <script src="./js/dashboard.js"></script>
+</body>
+</html>
