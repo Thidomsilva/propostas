@@ -1,9 +1,10 @@
 /* === CSS VARIABLES === */
 :root {
-    --primary: #2c3e50;
-    --primary-light: rgba(44, 62, 80, 0.1);
-    --secondary: #34495e;
-    --accent: #3498db;
+    /* Sagacy color palette */
+    --primary: #1e3d59;
+    --primary-light: rgba(30, 61, 89, 0.1);
+    --secondary: #27496d;
+    --accent: #17a2b8;
     --success: #27ae60;
     --warning: #f39c12;
     --danger: #e74c3c;
@@ -15,7 +16,7 @@
     --border: #dee2e6;
     --borderRadius: 12px;
     
-    --textPrimary: #2c3e50;
+    --textPrimary: #1e3d59;
     --textSecondary: #6c757d;
     --textMuted: #adb5bd;
     
