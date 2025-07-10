@@ -70,9 +70,27 @@ body {
     animation: spin 1s linear infinite;
 }
 
+.loading-bar {
+    width: 0;
+    height: 4px;
+    background: var(--primary);
+    animation: loading-bar 2s infinite;
+}
+
+.loading-text {
+    margin-top: 0.5rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+@keyframes loading-bar {
+    0% { width: 0; }
+    100% { width: 100%; }
 }
 
 /* === HEADER === */
