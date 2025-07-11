@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Prazo - Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 1rem;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .debug {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🧪 Teste de Prazo - Debug</h1>
+        <p>Teste específico para verificar se o campo prazo está sendo enviado e processado corretamente.</p>
+        
+        <form id="teste-form">
+            <div class="form-group">
+                <label for="cliente">Cliente:</label>
+                <input type="text" id="cliente" name="cliente" value="Empresa Teste" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="servico">Serviço:</label>
+                <select id="servico" name="servico" required>
+                    <option value="Consultoria">Consultoria</option>
+                    <option value="Auditoria Externa">Auditoria Externa</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="solicitante">Solicitante:</label>
+                <select id="solicitante" name="solicitante" required>
+                    <option value="Thiago">Thiago</option>
+                    <option value="Vandreia">Vandreia</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="descricao">Descrição:</label>
+                <textarea id="descricao" name="descricao" required>Teste de envio com prazo</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="prazo">Prazo Desejado:</label>
+                <input type="date" id="prazo" name="prazo" value="2025-07-25">
+            </div>
+            
+            <button type="submit" class="btn">🧪 Testar Envio</button>
+            <button type="button" class="btn" onclick="testarListagem()">📋 Testar Listagem</button>
+        </form>
+    </div>
+    
+    <div class="card">
+        <h2>🔍 Debug Console</h2>
+        <div id="debug-output" class="debug">Aguardando teste...</div>
+    </div>
+    
+    <script src="./js/main.js"></script>
+    <script src="./js/api.js"></script>
+    <script>
+        function log(message) {
+            const output = document.getElementById('debug-output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `[${timestamp}] ${message}\n`;
+            console.log(message);
+        }
+        
+        document.getElementById('teste-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            log('🧪 Iniciando teste de envio...');
+            
+            const formData = new FormData(e.target);
+            
+            const dados = {
+                id: 'TEST_' + Date.now(),
+                cliente: formData.get('cliente'),
+                servico: formData.get('servico'),
+                solicitante: formData.get('solicitante'),
+                descricao: formData.get('descricao'),
+                prazo: formData.get('prazo'),
+                status: 'Pendente',
+                data: new Date().toISOString()
+            };
+            
+            log('📊 Dados preparados:');
+            log(JSON.stringify(dados, null, 2));
+            
+            try {
+                log('📡 Enviando para API...');
+                const response = await apiCall('criar', dados);
+                
+                log('✅ Resposta recebida:');
+                log(JSON.stringify(response, null, 2));
+                
+                // Verificar ambos os formatos de resposta (success/sucesso)
+                const isSuccess = response.success || response.sucesso;
+                
+                if (isSuccess) {
+                    log('🎉 Sucesso! Verificando se prazo foi salvo...');
+                    
+                    // Verificar se prazo está na resposta
+                    const solicitacao = response.data?.solicitacao || response.dados?.solicitacao || {};
+                    if (solicitacao.prazo) {
+                        log('✅ PRAZO ENCONTRADO na resposta: ' + solicitacao.prazo);
+                    } else {
+                        log('⚠️ PRAZO NÃO ENCONTRADO na resposta!');
+                        log('📋 Campos retornados: ' + Object.keys(solicitacao).join(', '));
+                    }
+                    
+                    log('🔄 Aguardando 2 segundos para testar listagem...');
+                    setTimeout(() => testarListagem(), 2000);
+                } else {
+                    const message = response.message || response.mensagem || 'Erro desconhecido';
+                    log('❌ Erro na resposta: ' + message);
+                }
+                
+            } catch (error) {
+                log('❌ Erro no envio: ' + error.message);
+            }
+        });
+        
+        async function testarListagem() {
+            try {
+                log('📋 Testando listagem...');
+                
+                const response = await apiCall('listar');
+                
+                log('📋 Resposta da listagem:');
+                log(JSON.stringify(response, null, 2));
+                
+                // Verificar ambos os formatos
+                const isSuccess = response.success || response.sucesso;
+                const dados = response.data || response.dados || [];
+                
+                if (isSuccess && Array.isArray(dados)) {
+                    log(`📊 ${dados.length} solicitações encontradas`);
+                    
+                    dados.forEach((item, index) => {
+                        log(`\n--- Item ${index + 1} ---`);
+                        log(`ID: ${item.id || 'SEM ID'}`);
+                        log(`Cliente: ${item.cliente || 'SEM CLIENTE'}`);
+                        log(`Solicitante: ${item.solicitante || 'SEM SOLICITANTE'}`);
+                        log(`Data: ${item.data || 'SEM DATA'}`);
+                        log(`Prazo: ${item.prazo || 'PRAZO VAZIO! ❌'}`);
+                        log(`Status: ${item.status || 'SEM STATUS'}`);
+                        
+                        // Verificar especificamente os dados de teste
+                        if (item.cliente === 'Empresa Teste') {
+                            log('🎯 ITEM DE TESTE ENCONTRADO!');
+                            if (item.prazo) {
+                                log('✅ PRAZO ESTÁ SALVO: ' + item.prazo);
+                            } else {
+                                log('❌ PRAZO NÃO ESTÁ SALVO!');
+                                log('📋 Todos os campos: ' + Object.keys(item).join(', '));
+                            }
+                        }
+                    });
+                } else {
+                    log('❌ Erro na listagem ou dados inválidos');
+                    log('🔍 Success flag: ' + isSuccess);
+                    log('🔍 Dados tipo: ' + typeof dados);
+                }
+                
+            } catch (error) {
+                log('❌ Erro na listagem: ' + error.message);
+            }
+        }
+        
+        log('🚀 Sistema de teste carregado!');
+    </script>
+</body>
+</html>

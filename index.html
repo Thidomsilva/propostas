@@ -111,6 +111,7 @@
                                 <option value="Matoso">Matoso</option>
                                 <option value="Milena">Milena</option>
                                 <option value="Thiago">Thiago</option>
+                                <option value="Vandreia">Vandreia</option>
                                 <option value="Victor">Victor</option>
                                 <option value="William">William</option>
                                 <option value="Outros (especificar)">Outros (especificar)</option>
@@ -150,9 +151,6 @@
                             </button>
                             <button type="button" class="btn btn-secondary" onclick="limparFormulario()">
                                 Limpar
-                            </button>
-                            <button type="button" class="btn btn-info" onclick="testarNavegacaoDireta()">
-                                🧪 Testar Navegação
                             </button>
                         </div>
                     </form>
@@ -287,13 +285,14 @@
                                     <th>Projeto</th>
                                     <th>Solicitante</th>
                                     <th>Status</th>
-                                    <th>Data</th>
+                                    <th>Data Solicitação</th>
+                                    <th>Prazo</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="tabela-solicitacoes">
                                 <tr>
-                                    <td colspan="7" class="text-center">
+                                    <td colspan="8" class="text-center">
                                         Carregue os dados clicando em "Atualizar Lista"
                                     </td>
                                 </tr>
@@ -448,71 +447,6 @@
                 inputOutro.required = false;
                 inputOutro.value = '';
             }
-        }
-        
-        function testarNavegacaoDireta() {
-            console.log('🧪 Testando navegação direta...');
-            
-            // Verificar se elementos existem
-            const formulario = document.getElementById('formulario');
-            const painel = document.getElementById('painel');
-            const dashboard = document.getElementById('dashboard');
-            
-            console.log('📄 Formulário encontrado:', !!formulario);
-            console.log('📄 Painel encontrado:', !!painel);
-            console.log('📄 Dashboard encontrado:', !!dashboard);
-            
-            // Verificar funções
-            console.log('🔧 showPainel:', typeof showPainel);
-            console.log('🔧 switchPage:', typeof switchPage);
-            
-            // Método 1: Usar switchPage diretamente
-            console.log('🔄 Tentativa 1: switchPage("painel")');
-            if (typeof switchPage === 'function') {
-                try {
-                    switchPage('painel');
-                    console.log('✅ switchPage executado sem erro');
-                } catch (error) {
-                    console.error('❌ Erro no switchPage:', error);
-                }
-            } else {
-                console.log('❌ switchPage não é uma função');
-            }
-            
-            // Método 2: Navegação manual como fallback
-            setTimeout(() => {
-                console.log('🔄 Tentativa 2: navegação manual');
-                
-                if (formulario && painel) {
-                    // Esconder formulário
-                    formulario.classList.add('d-none');
-                    formulario.style.display = 'none';
-                    console.log('🔒 Formulário escondido');
-                    
-                    // Mostrar painel
-                    painel.classList.remove('d-none');
-                    painel.style.display = 'block';
-                    console.log('✅ Painel mostrado');
-                    
-                    // Ativar botão
-                    const buttons = document.querySelectorAll('.nav-button');
-                    buttons.forEach(btn => btn.classList.remove('active'));
-                    if (buttons[1]) {
-                        buttons[1].classList.add('active');
-                        console.log('✅ Botão do painel ativado');
-                    }
-                    
-                    // Verificar resultado
-                    setTimeout(() => {
-                        const painelStyle = window.getComputedStyle(painel);
-                        console.log('🔍 Resultado final - Painel display:', painelStyle.display);
-                        console.log('🔍 Resultado final - Painel visibility:', painelStyle.visibility);
-                        console.log('🔍 Resultado final - Painel classes:', painel.className);
-                    }, 100);
-                } else {
-                    console.error('❌ Elementos não encontrados para navegação manual');
-                }
-            }, 1000);
         }
         
         function limparFormulario() {

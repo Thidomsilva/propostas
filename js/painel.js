@@ -42,7 +42,7 @@ function renderSolicitacoes() {
     if (solicitacoes.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" class="text-center text-muted">
+                <td colspan="8" class="text-center text-muted">
                     Nenhuma solicitação encontrada
                 </td>
             </tr>
@@ -53,15 +53,16 @@ function renderSolicitacoes() {
     tbody.innerHTML = solicitacoes.map(item => `
         <tr data-id="${item.id}">
             <td>${item.id || '-'}</td>
-            <td>${item.solicitante || '-'}</td>
             <td>${item.cliente || '-'}</td>
             <td>${item.servico || '-'}</td>
+            <td>${item.solicitante || '-'}</td>
             <td>
                 <span class="status-badge ${getStatusClass(item.status)}">
                     ${item.status || 'Pendente'}
                 </span>
             </td>
             <td>${formatDate(item.data) || '-'}</td>
+            <td>${formatDate(item.prazo) || '-'}</td>
             <td>
                 <select class="form-control" onchange="updateStatus('${item.id}', this.value)">
                     <option value="Pendente" ${item.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
@@ -84,15 +85,16 @@ function updateSingleRow(id, item) {
     
     row.innerHTML = `
         <td>${item.id || '-'}</td>
-        <td>${item.solicitante || '-'}</td>
         <td>${item.cliente || '-'}</td>
         <td>${item.servico || '-'}</td>
+        <td>${item.solicitante || '-'}</td>
         <td>
             <span class="status-badge ${getStatusClass(item.status)}">
                 ${item.status || 'Pendente'}
             </span>
         </td>
         <td>${formatDate(item.data) || '-'}</td>
+        <td>${formatDate(item.prazo) || '-'}</td>
         <td>
             <select class="form-control" onchange="updateStatus('${item.id}', this.value)">
                 <option value="Pendente" ${item.status === 'Pendente' ? 'selected' : ''}>Pendente</option>

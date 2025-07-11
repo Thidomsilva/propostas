@@ -1,4 +1,4 @@
-/* === DASHBOARD OTIMIZADO === */
+/* === DASHBOARD OTIMIZADO - SAGACY COLORS === */
 
 /* Performance Grid */
 .performance-grid {
@@ -19,6 +19,7 @@
 
 .performance-card:hover {
     box-shadow: var(--shadow-hover);
+    border-color: var(--sagacy-primary);
 }
 
 /* Status Distribution */
@@ -37,11 +38,11 @@
 
 .status-label {
     font-weight: 500;
-    color: var(--textPrimary);
+    color: var(--sagacy-primary);
 }
 
 .status-bar-container {
-    background: var(--bgSecondary);
+    background: var(--sagacy-bg);
     height: 20px;
     border-radius: 10px;
     overflow: hidden;
@@ -55,21 +56,25 @@
     position: relative;
 }
 
-.status-bar.status-andamento {
-    background: linear-gradient(90deg, #17a2b8, #0ea5e9);
-}
-
-.status-bar.status-finalizado {
-    background: linear-gradient(90deg, #28a745, #10b981);
-}
-
-.status-bar.status-aberto {
+.status-bar.status-pendente {
     background: linear-gradient(90deg, #ffc107, #f59e0b);
+}
+
+.status-bar.status-andamento {
+    background: linear-gradient(90deg, #088cdc, #0ea5e9);
+}
+
+.status-bar.status-concluido {
+    background: linear-gradient(90deg, #198754, #10b981);
+}
+
+.status-bar.status-cancelado {
+    background: linear-gradient(90deg, #dc3545, #ef4444);
 }
 
 .status-percent {
     font-weight: 600;
-    color: var(--textPrimary);
+    color: var(--sagacy-primary);
     text-align: right;
 }
 

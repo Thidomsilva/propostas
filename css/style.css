@@ -1,27 +1,45 @@
-/* === CSS VARIABLES === */
+/* === CSS VARIABLES - SAGACY OFFICIAL === */
 :root {
-    /* Sagacy color palette */
-    --primary: #1e3d59;
-    --primary-light: rgba(30, 61, 89, 0.1);
-    --secondary: #27496d;
-    --accent: #17a2b8;
-    --success: #27ae60;
-    --warning: #f39c12;
-    --danger: #e74c3c;
-    --info: #17a2b8;
+    /* Sagacy Official Colors */
+    --sagacy-primary: #215269;
+    --sagacy-blue: #088cdc;
+    --sagacy-orange: #cc5000;
+    --sagacy-green: #52bf81;
     
+    /* Primary Palette */
+    --primary: #215269;
+    --primary-light: rgba(33, 82, 105, 0.1);
+    --secondary: #088cdc;
+    --accent: #cc5000;
+    
+    /* State Colors */
+    --success: #198754;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --info: #088cdc;
+    
+    /* Sagacy Grays */
+    --gray-dark: #2a2d32;
+    --gray-medium: #666666;
+    --gray-light: #999999;
+    --gray-lighter: #cccccc;
+    --gray-bg: #eff2f7;
+    
+    /* Backgrounds */
     --bg: #f8f9fa;
-    --bgSecondary: #e9ecef;
+    --bgSecondary: #eff2f7;
     --cardBg: #ffffff;
-    --border: #dee2e6;
+    --border: #eeeeee;
     --borderRadius: 12px;
     
-    --textPrimary: #1e3d59;
-    --textSecondary: #6c757d;
-    --textMuted: #adb5bd;
+    /* Text Colors */
+    --textPrimary: #2a2d32;
+    --textSecondary: #666666;
+    --textMuted: #999999;
     
-    --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.15);
+    /* Effects */
+    --shadow: 0 2px 10px rgba(33, 82, 105, 0.1);
+    --shadow-hover: 0 4px 20px rgba(33, 82, 105, 0.15);
     
     --transition: all 0.3s ease;
 }
@@ -202,19 +220,22 @@ body {
 
 .card-header {
     margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    background: var(--sagacy-primary);
+    color: white;
+    border-radius: var(--borderRadius) var(--borderRadius) 0 0;
+    border-bottom: none;
 }
 
 .card-title {
     font-size: 1.5rem;
     font-weight: 600;
-    color: var(--textPrimary);
+    color: inherit;
     margin-bottom: 0.5rem;
 }
 
 .card-subtitle {
-    color: var(--textSecondary);
+    color: rgba(255, 255, 255, 0.8);
     font-size: 0.9rem;
 }
 
@@ -281,24 +302,27 @@ textarea.form-control {
 }
 
 .btn-primary {
-    background: var(--primary);
+    background: var(--sagacy-primary);
     color: white;
+    border: 1px solid var(--sagacy-primary);
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: var(--secondary);
+    background: var(--sagacy-orange);
+    border-color: var(--sagacy-orange);
     transform: translateY(-1px);
     box-shadow: var(--shadow);
 }
 
 .btn-secondary {
-    background: var(--bgSecondary);
-    color: var(--textPrimary);
-    border: 1px solid var(--border);
+    background: var(--sagacy-blue);
+    color: white;
+    border: 1px solid var(--sagacy-blue);
 }
 
 .btn-secondary:hover:not(:disabled) {
-    background: var(--border);
+    background: var(--sagacy-primary);
+    border-color: var(--sagacy-primary);
 }
 
 .btn-success {
@@ -351,7 +375,17 @@ textarea.form-control {
     border-bottom: none;
 }
 
-/* === STATUS BADGES === */
+/* === COLUNAS DE DATA NO PAINEL === */
+.table th:nth-child(6),
+.table th:nth-child(7),
+.table td:nth-child(6),
+.table td:nth-child(7) {
+    min-width: 120px;
+    white-space: nowrap;
+    font-size: 0.9rem;
+}
+
+/* === STATUS BADGES - SAGACY COLORS === */
 .status-badge {
     display: inline-block;
     padding: 0.25rem 0.75rem;
@@ -363,23 +397,23 @@ textarea.form-control {
 }
 
 .status-pendente {
-    background: rgba(243, 156, 18, 0.2);
-    color: var(--warning);
+    background-color: var(--warning);
+    color: var(--gray-dark);
 }
 
 .status-em-andamento {
-    background: rgba(52, 152, 219, 0.2);
-    color: var(--info);
+    background-color: var(--sagacy-blue);
+    color: white;
 }
 
 .status-concluido {
-    background: rgba(39, 174, 96, 0.2);
-    color: var(--success);
+    background-color: var(--success);
+    color: white;
 }
 
 .status-cancelado {
-    background: rgba(231, 76, 60, 0.2);
-    color: var(--danger);
+    background-color: var(--danger);
+    color: white;
 }
 
 /* === TOAST NOTIFICATIONS === */
