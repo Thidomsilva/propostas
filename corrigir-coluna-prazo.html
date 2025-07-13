@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 CORREÇÃO URGENTE - Adicionar Coluna Prazo</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #f5f5f5; 
+        }
+        .container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            max-width: 1000px; 
+            margin: 0 auto;
+        }
+        .btn { 
+            background: #dc3545; 
+            color: white; 
+            padding: 15px 25px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .btn:hover { 
+            background: #c82333; 
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            padding: 15px; 
+            border-radius: 4px; 
+            margin: 10px 0;
+            border: 1px solid #f5c6cb;
+        }
+        .success { 
+            background: #d4edda; 
+            color: #155724; 
+            padding: 15px; 
+            border-radius: 4px; 
+            margin: 10px 0;
+            border: 1px solid #c3e6cb;
+        }
+        .warning { 
+            background: #fff3cd; 
+            color: #856404; 
+            padding: 15px; 
+            border-radius: 4px; 
+            margin: 10px 0;
+            border: 1px solid #faeeba;
+        }
+        .code-block {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            border: 1px solid #e9ecef;
+            margin: 10px 0;
+        }
+        .step {
+            background: #e7f3ff;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 PROBLEMA IDENTIFICADO: COLUNA PRAZO INEXISTENTE</h1>
+        
+        <div class="error">
+            <strong>❌ ROOT CAUSE:</strong><br>
+            A coluna "Prazo" não existe fisicamente na planilha do Google Sheets!<br>
+            Por isso os dados aparecem como "-" ou valores incorretos.
+        </div>
+        
+        <div class="warning">
+            <strong>⚠️ VERIFICAÇÃO NECESSÁRIA:</strong><br>
+            Vamos testar se o backend consegue adicionar a coluna automaticamente ou se precisa ser feito manualmente.
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <button class="btn" onclick="verificarEstrutura()">🔍 VERIFICAR ESTRUTURA DA PLANILHA</button>
+            <button class="btn btn-success" onclick="adicionarColunaPrazo()">➕ ADICIONAR COLUNA PRAZO</button>
+        </div>
+        
+        <div id="resultado"></div>
+        
+        <div class="step">
+            <h3>🛠️ SOLUÇÃO MANUAL (se o automático falhar):</h3>
+            <ol>
+                <li><strong>Abra o Google Sheets:</strong> <code>https://docs.google.com/spreadsheets/d/12TDtLrXg4NM6H4kc6_x8gjsQCdKl76fkuqFCRc4-QRo</code></li>
+                <li><strong>Vá para a aba:</strong> "propostasacompanhamento"</li>
+                <li><strong>Encontre a coluna F:</strong> Deve estar vazia ou ter outro nome</li>
+                <li><strong>Na célula F1, digite:</strong> <code>Prazo</code></li>
+                <li><strong>Salve:</strong> Ctrl+S</li>
+                <li><strong>Teste novamente:</strong> Volte ao painel e clique "Atualizar Lista"</li>
+            </ol>
+        </div>
+        
+        <div class="step">
+            <h3>📋 ESTRUTURA ESPERADA DA PLANILHA:</h3>
+            <div class="code-block">
+A1: Data<br>
+B1: Cliente<br>
+C1: Serviço<br>
+D1: Solicitante<br>
+E1: Descrição<br>
+<strong>F1: Prazo ⬅️ ESTA COLUNA DEVE EXISTIR</strong><br>
+G1: Status<br>
+H1: Observações<br>
+I1: Data Atualização
+            </div>
+        </div>
+        
+        <div id="instrucoes-detalhadas" style="display: none;">
+            <div class="success">
+                <h3>✅ PRÓXIMOS PASSOS APÓS ADICIONAR A COLUNA:</h3>
+                <ol>
+                    <li>Verifique se a coluna "Prazo" aparece na posição F1</li>
+                    <li>Teste criar uma nova solicitação com prazo</li>
+                    <li>Verifique se o prazo é salvo corretamente</li>
+                    <li>Confirme se aparece no painel de acompanhamento</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxx9o15oYbZmyk8jxhyWSCGvi6lLIDM6mpHJ2SJXbShEYTGeNInuei7Tys0IiLsICOu4Q/exec';
+        
+        function mostrarResultado(html) {
+            document.getElementById('resultado').innerHTML = html;
+        }
+        
+        function mostrarInstrucoes() {
+            document.getElementById('instrucoes-detalhadas').style.display = 'block';
+        }
+        
+        async function verificarEstrutura() {
+            try {
+                mostrarResultado('<div class="warning">🔄 Verificando estrutura da planilha...</div>');
+                
+                const response = await new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    const callbackName = 'corsCallback';
+                    
+                    window[callbackName] = function(data) {
+                        document.head.removeChild(script);
+                        delete window[callbackName];
+                        resolve(data);
+                    };
+                    
+                    script.src = `${API_URL}?action=listar&callback=${callbackName}`;
+                    script.onerror = () => {
+                        document.head.removeChild(script);
+                        delete window[callbackName];
+                        reject(new Error('Erro na requisição'));
+                    };
+                    
+                    document.head.appendChild(script);
+                    
+                    setTimeout(() => {
+                        if (window[callbackName]) {
+                            document.head.removeChild(script);
+                            delete window[callbackName];
+                            reject(new Error('Timeout'));
+                        }
+                    }, 10000);
+                });
+                
+                console.log('📦 Resposta completa:', response);
+                
+                const dados = response.dados || response.data || [];
+                
+                if (dados.length > 0) {
+                    const primeiroItem = dados[0];
+                    const temPrazo = primeiroItem.hasOwnProperty('prazo');
+                    const valorPrazo = primeiroItem.prazo;
+                    
+                    let html = `
+                        <div class="success">
+                            <h4>📊 ESTRUTURA VERIFICADA:</h4>
+                            <strong>Total de registros:</strong> ${dados.length}<br>
+                            <strong>Versão do backend:</strong> ${response.versao}<br>
+                            <strong>Campo 'prazo' existe:</strong> ${temPrazo ? '✅ SIM' : '❌ NÃO'}<br>
+                            <strong>Valor do primeiro prazo:</strong> "${valorPrazo}" (${typeof valorPrazo})<br>
+                        </div>
+                        
+                        <div class="code-block">
+                            <strong>Primeiro registro completo:</strong><br>
+                            ${JSON.stringify(primeiroItem, null, 2)}
+                        </div>
+                    `;
+                    
+                    if (!temPrazo || valorPrazo === undefined || valorPrazo === null) {
+                        html += `
+                            <div class="error">
+                                <strong>❌ CONFIRMADO: A coluna "Prazo" não existe na planilha!</strong><br>
+                                É necessário adicionar manualmente ou usar a função automática.
+                            </div>
+                        `;
+                        mostrarInstrucoes();
+                    } else {
+                        html += `
+                            <div class="success">
+                                <strong>✅ A coluna "Prazo" existe!</strong><br>
+                                O problema pode estar na renderização do frontend.
+                            </div>
+                        `;
+                    }
+                    
+                    mostrarResultado(html);
+                } else {
+                    mostrarResultado(`
+                        <div class="warning">
+                            ⚠️ Nenhum dado encontrado na planilha.<br>
+                            Isso pode indicar que a planilha está vazia ou há problema de acesso.
+                        </div>
+                    `);
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                mostrarResultado(`
+                    <div class="error">
+                        <strong>❌ Erro ao verificar estrutura:</strong><br>
+                        ${error.message}
+                    </div>
+                `);
+            }
+        }
+        
+        async function adicionarColunaPrazo() {
+            try {
+                mostrarResultado('<div class="warning">🔄 Tentando adicionar coluna "Prazo" automaticamente...</div>');
+                
+                // Fazer uma requisição especial para inicializar/verificar a planilha
+                const response = await new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    const callbackName = 'corsCallback' + Date.now();
+                    
+                    window[callbackName] = function(data) {
+                        document.head.removeChild(script);
+                        delete window[callbackName];
+                        resolve(data);
+                    };
+                    
+                    // Usar uma ação que force a verificação da estrutura
+                    script.src = `${API_URL}?action=listar&force_structure_check=true&callback=${callbackName}`;
+                    script.onerror = () => {
+                        document.head.removeChild(script);
+                        delete window[callbackName];
+                        reject(new Error('Erro na requisição'));
+                    };
+                    
+                    document.head.appendChild(script);
+                    
+                    setTimeout(() => {
+                        if (window[callbackName]) {
+                            document.head.removeChild(script);
+                            delete window[callbackName];
+                            reject(new Error('Timeout'));
+                        }
+                    }, 15000);
+                });
+                
+                mostrarResultado(`
+                    <div class="success">
+                        <strong>✅ Processo executado!</strong><br>
+                        Versão: ${response.versao}<br>
+                        <br>
+                        <strong>Agora faça o teste:</strong><br>
+                        1. Volte ao painel principal<br>
+                        2. Clique em "Atualizar Lista"<br>
+                        3. Verifique se os prazos aparecem<br>
+                        <br>
+                        Se ainda não funcionar, use a solução manual abaixo.
+                    </div>
+                `);
+                
+                mostrarInstrucoes();
+                
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                mostrarResultado(`
+                    <div class="error">
+                        <strong>❌ Função automática falhou:</strong><br>
+                        ${error.message}<br>
+                        <br>
+                        <strong>Use a solução manual:</strong> Adicione a coluna "Prazo" manualmente na planilha.
+                    </div>
+                `);
+                mostrarInstrucoes();
+            }
+        }
+        
+        // Auto-verificar ao carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(verificarEstrutura, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Prazo - Painel</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #f5f5f5; 
+        }
+        .test-container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            max-width: 1200px; 
+            margin: 0 auto;
+        }
+        .test-section { 
+            margin: 20px 0; 
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+            background: #fafafa;
+        }
+        .table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 10px 0;
+        }
+        .table th, .table td { 
+            padding: 8px; 
+            text-align: left; 
+            border: 1px solid #ddd; 
+        }
+        .table th { 
+            background: #f0f0f0; 
+            font-weight: bold;
+        }
+        pre { 
+            background: #f8f8f8; 
+            padding: 10px; 
+            border-radius: 4px; 
+            font-size: 12px; 
+            overflow-x: auto;
+        }
+        .btn { 
+            background: #007bff; 
+            color: white; 
+            padding: 10px 15px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        .btn:hover { 
+            background: #0056b3; 
+        }
+        .log { 
+            background: #e8f5e8; 
+            padding: 10px; 
+            margin: 5px 0; 
+            border-radius: 4px; 
+            border-left: 4px solid #28a745;
+        }
+        .error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border-left-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔍 Teste - Visualização de Prazos no Painel</h1>
+        
+        <div class="test-section">
+            <h3>📋 Teste de Dados do Backend</h3>
+            <button class="btn" onclick="testarBackend()">🔄 Buscar Dados do Backend</button>
+            <div id="resultado-backend"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 Dados Processados para Tabela</h3>
+            <div id="dados-processados"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📅 Teste de Formatação de Datas</h3>
+            <div id="teste-datas"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🏢 Tabela de Visualização Final</h3>
+            <table class="table" id="tabela-resultado">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Projeto</th>
+                        <th>Solicitante</th>
+                        <th>Status</th>
+                        <th>Data Solicitação</th>
+                        <th>Prazo</th>
+                        <th>Tipo Prazo</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-body">
+                    <tr>
+                        <td colspan="8" style="text-align: center;">Clique em "Buscar Dados" para testar</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="test-section">
+            <h3>📝 Log de Debug</h3>
+            <div id="debug-log"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxx9o15oYbZmyk8jxhyWSCGvi6lLIDM6mpHJ2SJXbShEYTGeNInuei7Tys0IiLsICOu4Q/exec';
+        
+        function log(message, isError = false) {
+            const logDiv = document.getElementById('debug-log');
+            const logEntry = document.createElement('div');
+            logEntry.className = isError ? 'log error' : 'log';
+            logEntry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            
+            try {
+                // Log para debug
+                log(`📅 Formatando data: "${dateString}" (tipo: ${typeof dateString})`);
+                
+                const date = new Date(dateString);
+                const resultado = date.toLocaleDateString('pt-BR');
+                
+                log(`✅ Data formatada: "${resultado}"`);
+                return resultado;
+            } catch (error) {
+                log(`❌ Erro ao formatar data "${dateString}": ${error.message}`, true);
+                return '-';
+            }
+        }
+        
+        async function testarBackend() {
+            try {
+                log('🔄 Iniciando busca de dados do backend...');
+                
+                // Fazer requisição JSONP
+                const response = await new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    const callbackName = 'corsCallback_' + Date.now();
+                    
+                    window[callbackName] = function(data) {
+                        document.head.removeChild(script);
+                        delete window[callbackName];
+                        resolve(data);
+                    };
+                    
+                    script.src = `${API_URL}?action=listar&callback=${callbackName}`;
+                    script.onerror = () => {
+                        document.head.removeChild(script);
+                        delete window[callbackName];
+                        reject(new Error('Erro na requisição'));
+                    };
+                    
+                    document.head.appendChild(script);
+                    
+                    setTimeout(() => {
+                        if (window[callbackName]) {
+                            document.head.removeChild(script);
+                            delete window[callbackName];
+                            reject(new Error('Timeout'));
+                        }
+                    }, 10000);
+                });
+                
+                log('✅ Dados recebidos do backend');
+                
+                // Mostrar resposta raw
+                document.getElementById('resultado-backend').innerHTML = `
+                    <h4>📦 Resposta Completa do Backend:</h4>
+                    <pre>${JSON.stringify(response, null, 2)}</pre>
+                `;
+                
+                // Processar dados
+                const dados = response?.dados || response?.data || [];
+                log(`📊 Total de registros: ${dados.length}`);
+                
+                // Mostrar dados processados
+                document.getElementById('dados-processados').innerHTML = `
+                    <h4>🔧 Dados Extraídos (${dados.length} registros):</h4>
+                    <pre>${JSON.stringify(dados, null, 2)}</pre>
+                `;
+                
+                // Testar formatação de datas
+                testarFormatacaoDatas(dados);
+                
+                // Renderizar tabela
+                renderTabelaTeste(dados);
+                
+            } catch (error) {
+                log(`❌ Erro: ${error.message}`, true);
+                document.getElementById('resultado-backend').innerHTML = `
+                    <div style="color: red;">
+                        <h4>❌ Erro ao buscar dados:</h4>
+                        <pre>${error.message}</pre>
+                    </div>
+                `;
+            }
+        }
+        
+        function testarFormatacaoDatas(dados) {
+            log('📅 Testando formatação de datas...');
+            
+            let html = '<h4>🧪 Teste de Formatação:</h4>';
+            
+            dados.slice(0, 5).forEach((item, index) => {
+                html += `
+                    <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <strong>Item ${index + 1} (ID: ${item.id}):</strong><br>
+                        📅 Data Original: "${item.data}" (tipo: ${typeof item.data})<br>
+                        📅 Data Formatada: "${formatDate(item.data)}"<br>
+                        ⏰ Prazo Original: "${item.prazo}" (tipo: ${typeof item.prazo})<br>
+                        ⏰ Prazo Formatado: "${formatDate(item.prazo)}"<br>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('teste-datas').innerHTML = html;
+        }
+        
+        function renderTabelaTeste(dados) {
+            log('🏢 Renderizando tabela de teste...');
+            
+            const tbody = document.getElementById('tabela-body');
+            
+            if (dados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Nenhum dado encontrado</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = dados.map(item => {
+                const dataFormatada = formatDate(item.data);
+                const prazoFormatado = formatDate(item.prazo);
+                
+                return `
+                    <tr>
+                        <td>${item.id || '-'}</td>
+                        <td>${item.cliente || '-'}</td>
+                        <td>${item.servico || '-'}</td>
+                        <td>${item.solicitante || '-'}</td>
+                        <td>${item.status || 'Pendente'}</td>
+                        <td>${dataFormatada}</td>
+                        <td style="background: ${prazoFormatado === '-' ? '#ffebee' : '#e8f5e8'};">
+                            ${prazoFormatado}
+                        </td>
+                        <td style="font-size: 11px;">
+                            Raw: "${item.prazo}"<br>
+                            Tipo: ${typeof item.prazo}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            log(`✅ Tabela renderizada com ${dados.length} registros`);
+        }
+        
+        // Auto-teste ao carregar página
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🚀 Página carregada, aguardando teste manual...');
+        });
+    </script>
+</body>
+</html>

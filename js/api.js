@@ -4,7 +4,17 @@
 async function apiCall(endpoint, data = null) {
     console.log('🔄 Iniciando chamada da API:', endpoint, data);
     
-    // Lista de métodos para tentar
+    // Para Google Apps Script, usar JSONP primeiro (mais confiável)
+    try {
+        console.log('🌐 Tentativa 1: JSONP');
+        const jsonpResult = await makeJsonpRequest(endpoint, data);
+        console.log('✅ JSONP funcionou:', jsonpResult);
+        return jsonpResult;
+    } catch (jsonpError) {
+        console.log('⚠️ JSONP falhou:', jsonpError.message);
+    }
+    
+    // Lista de métodos fetch para tentar como fallback
     const methods = [
         {
             name: 'POST_JSON',
@@ -382,6 +392,73 @@ async function processResponse(response, methodName) {
     }
     
     throw new Error(`Resposta inválida do servidor. Método: ${methodName}. Conteúdo: ${cleanText.substring(0, 100)}`);
+}
+
+// === FUNÇÃO JSONP PARA GOOGLE APPS SCRIPT ===
+async function makeJsonpRequest(endpoint, data = null) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        const callbackName = 'corsCallback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        
+        // Definir callback global
+        window[callbackName] = function(response) {
+            document.head.removeChild(script);
+            delete window[callbackName];
+            
+            console.log('📦 JSONP Response:', response);
+            
+            // Normalizar resposta para compatibilidade
+            const normalizedResponse = {
+                success: response.sucesso || response.success || false,
+                sucesso: response.sucesso || response.success || false,
+                message: response.mensagem || response.message || '',
+                mensagem: response.mensagem || response.message || '',
+                data: response.dados || response.data || null,
+                dados: response.dados || response.data || null,
+                timestamp: response.timestamp || new Date().toISOString(),
+                versao: response.versao || response.version || 'unknown',
+                _original: response
+            };
+            
+            resolve(normalizedResponse);
+        };
+        
+        // Construir URL
+        let url = `${API_CONFIG.BASE_URL}?action=${endpoint}&callback=${callbackName}`;
+        
+        if (data) {
+            // Adicionar dados como parâmetros URL
+            const params = new URLSearchParams();
+            for (const [key, value] of Object.entries(data)) {
+                if (value !== null && value !== undefined) {
+                    params.append(key, value);
+                }
+            }
+            if (params.toString()) {
+                url += '&' + params.toString();
+            }
+        }
+        
+        console.log('🌐 JSONP URL:', url);
+        
+        script.src = url;
+        script.onerror = () => {
+            document.head.removeChild(script);
+            delete window[callbackName];
+            reject(new Error('Erro na requisição JSONP'));
+        };
+        
+        document.head.appendChild(script);
+        
+        // Timeout de 15 segundos
+        setTimeout(() => {
+            if (window[callbackName]) {
+                document.head.removeChild(script);
+                delete window[callbackName];
+                reject(new Error('Timeout na requisição JSONP'));
+            }
+        }, 15000);
+    });
 }
 
 // === FUNÇÕES DE TESTE DA API ===

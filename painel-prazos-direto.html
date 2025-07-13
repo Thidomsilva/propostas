@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Prazos - Teste Direto</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #f5f5f5; 
+        }
+        .container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            max-width: 1400px; 
+            margin: 0 auto;
+        }
+        .btn { 
+            background: #007bff; 
+            color: white; 
+            padding: 12px 20px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px;
+            font-size: 14px;
+        }
+        .btn:hover { 
+            background: #0056b3; 
+        }
+        .table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 15px 0;
+        }
+        .table th, .table td { 
+            padding: 10px; 
+            text-align: left; 
+            border: 1px solid #ddd; 
+        }
+        .table th { 
+            background: #f0f0f0; 
+            font-weight: bold;
+        }
+        .error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            padding: 10px; 
+            border-radius: 4px; 
+            margin: 10px 0;
+        }
+        .success { 
+            background: #d4edda; 
+            color: #155724; 
+            padding: 10px; 
+            border-radius: 4px; 
+            margin: 10px 0;
+        }
+        .info { 
+            background: #d1ecf1; 
+            color: #0c5460; 
+            padding: 10px; 
+            border-radius: 4px; 
+            margin: 10px 0;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-pendente { background: #fff3cd; color: #856404; }
+        .status-andamento { background: #d1ecf1; color: #0c5460; }
+        .status-concluido { background: #d4edda; color: #155724; }
+        .status-cancelado { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Painel de Prazos - Teste Direto</h1>
+        
+        <div style="margin: 20px 0;">
+            <button class="btn" onclick="carregarDados()">🔄 Carregar Dados</button>
+            <button class="btn" onclick="limparTabela()">🗑️ Limpar</button>
+        </div>
+        
+        <div id="status"></div>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Projeto</th>
+                    <th>Solicitante</th>
+                    <th>Status</th>
+                    <th>Data Solicitação</th>
+                    <th>🎯 Prazo</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-corpo">
+                <tr>
+                    <td colspan="8" style="text-align: center;">Clique em "Carregar Dados" para começar</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxx9o15oYbZmyk8jxhyWSCGvi6lLIDM6mpHJ2SJXbShEYTGeNInuei7Tys0IiLsICOu4Q/exec';
+        
+        let solicitacoes = [];
+        
+        function mostrarStatus(mensagem, tipo = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="${tipo}">${mensagem}</div>`;
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            
+            try {
+                // Se a string contém palavras como status, não é uma data
+                if (typeof dateString === 'string') {
+                    const statusWords = ['pendente', 'andamento', 'concluído', 'concluido', 'cancelado', 'finalizado'];
+                    const isStatus = statusWords.some(word => dateString.toLowerCase().includes(word));
+                    if (isStatus) {
+                        return dateString; // Retorna como texto se for um status
+                    }
+                }
+                
+                const date = new Date(dateString);
+                
+                // Verificar se a data é válida
+                if (isNaN(date.getTime())) {
+                    return dateString; // Retorna como texto se não for uma data válida
+                }
+                
+                return date.toLocaleDateString('pt-BR');
+            } catch (error) {
+                return dateString || '-';
+            }
+        }
+        
+        function getStatusClass(status) {
+            const classes = {
+                'Pendente': 'status-pendente',
+                'Em Andamento': 'status-andamento',
+                'Concluído': 'status-concluido',
+                'Cancelado': 'status-cancelado'
+            };
+            return classes[status] || 'status-pendente';
+        }
+        
+        async function carregarDados() {
+            try {
+                mostrarStatus('🔄 Carregando dados do backend...', 'info');
+                
+                // Usar JSONP em vez de fetch para evitar problemas de CORS
+                const dados = await new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    const callbackName = 'corsCallback';
+                    
+                    // Definir callback global
+                    window[callbackName] = function(data) {
+                        document.head.removeChild(script);
+                        delete window[callbackName];
+                        resolve(data);
+                    };
+                    
+                    script.src = `${API_URL}?action=listar&callback=${callbackName}`;
+                    script.onerror = () => {
+                        document.head.removeChild(script);
+                        delete window[callbackName];
+                        reject(new Error('Erro na requisição'));
+                    };
+                    
+                    document.head.appendChild(script);
+                    
+                    // Timeout de 10 segundos
+                    setTimeout(() => {
+                        if (window[callbackName]) {
+                            document.head.removeChild(script);
+                            delete window[callbackName];
+                            reject(new Error('Timeout na requisição'));
+                        }
+                    }, 10000);
+                });
+                
+                console.log('📦 Dados recebidos:', dados);
+                
+                // Verificar se a resposta é válida
+                if (!dados || (!dados.sucesso && !dados.success)) {
+                    throw new Error('Resposta inválida do servidor');
+                }
+                
+                const registros = dados.dados || dados.data || [];
+                solicitacoes = registros;
+                
+                mostrarStatus(`✅ ${registros.length} solicitações carregadas. Versão backend: ${dados.versao}`, 'success');
+                
+                renderizarTabela();
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar dados:', error);
+                mostrarStatus(`❌ Erro: ${error.message}`, 'error');
+            }
+        }
+        
+        function renderizarTabela() {
+            const tbody = document.getElementById('tabela-corpo');
+            
+            if (solicitacoes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Nenhuma solicitação encontrada</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = solicitacoes.map(item => {
+                // Debug específico para prazo
+                console.log(`🔍 Item ${item.id}: prazo="${item.prazo}" (${typeof item.prazo})`);
+                
+                // Formatação melhorada para prazo
+                let prazoFormatado = '-';
+                let corPrazo = '#999';
+                let pesoPrazo = 'normal';
+                
+                if (item.prazo) {
+                    // Se o prazo parece ser uma data
+                    if (item.prazo.includes('-') || item.prazo.includes('/') || /\d{4}/.test(item.prazo)) {
+                        prazoFormatado = formatDate(item.prazo);
+                        corPrazo = '#2c5aa0';
+                        pesoPrazo = 'bold';
+                    } else {
+                        // Se não é uma data, mostrar como texto
+                        prazoFormatado = item.prazo;
+                        corPrazo = '#d68910';
+                        pesoPrazo = 'bold';
+                    }
+                }
+                
+                return `
+                    <tr>
+                        <td>${item.id || '-'}</td>
+                        <td>${item.cliente || '-'}</td>
+                        <td>${item.servico || '-'}</td>
+                        <td>${item.solicitante || '-'}</td>
+                        <td>
+                            <span class="status-badge ${getStatusClass(item.status)}">
+                                ${item.status || 'Pendente'}
+                            </span>
+                        </td>
+                        <td>${formatDate(item.data) || '-'}</td>
+                        <td style="color: ${corPrazo}; font-weight: ${pesoPrazo};">
+                            ${prazoFormatado}
+                        </td>
+                        <td>
+                            <select onchange="atualizarStatus('${item.id}', this.value)">
+                                <option value="Pendente" ${item.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
+                                <option value="Em Andamento" ${item.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
+                                <option value="Concluído" ${item.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
+                                <option value="Cancelado" ${item.status === 'Cancelado' ? 'selected' : ''}>Cancelado</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        async function atualizarStatus(id, novoStatus) {
+            try {
+                mostrarStatus(`🔄 Atualizando status do item ${id}...`, 'info');
+                
+                // Fazer atualização via JSONP também
+                const response = await new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    const callbackName = 'corsCallback' + Date.now();
+                    
+                    window[callbackName] = function(data) {
+                        document.head.removeChild(script);
+                        delete window[callbackName];
+                        resolve(data);
+                    };
+                    
+                    const url = `${API_URL}?action=atualizar&id=${id}&status=${encodeURIComponent(novoStatus)}&callback=${callbackName}`;
+                    script.src = url;
+                    script.onerror = () => {
+                        document.head.removeChild(script);
+                        delete window[callbackName];
+                        reject(new Error('Erro na atualização'));
+                    };
+                    
+                    document.head.appendChild(script);
+                    
+                    setTimeout(() => {
+                        if (window[callbackName]) {
+                            document.head.removeChild(script);
+                            delete window[callbackName];
+                            reject(new Error('Timeout na atualização'));
+                        }
+                    }, 10000);
+                });
+                
+                if (response && (response.sucesso || response.success)) {
+                    mostrarStatus(`✅ Status atualizado com sucesso!`, 'success');
+                    
+                    // Atualizar item local
+                    const item = solicitacoes.find(s => s.id == id);
+                    if (item) {
+                        item.status = novoStatus;
+                        renderizarTabela();
+                    }
+                } else {
+                    throw new Error('Falha na atualização');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao atualizar:', error);
+                mostrarStatus(`❌ Erro na atualização: ${error.message}`, 'error');
+                // Recarregar dados para reverter mudança
+                carregarDados();
+            }
+        }
+        
+        function limparTabela() {
+            solicitacoes = [];
+            document.getElementById('tabela-corpo').innerHTML = '<tr><td colspan="8" style="text-align: center;">Tabela limpa</td></tr>';
+            mostrarStatus('Tabela limpa', 'info');
+        }
+        
+        // Auto-carregar ao abrir página
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(carregarDados, 1000);
+        });
+    </script>
+</body>
+</html>

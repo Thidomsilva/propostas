@@ -98,12 +98,36 @@ async function loadDashboardData() {
         
         if (response && isSuccess && Array.isArray(dados)) {
             console.log('📊 Dados válidos encontrados:', dados.length, 'registros');
+            console.log('📊 Amostra dos primeiros 3 registros:', dados.slice(0, 3));
+            
+            // Verificar qualidade dos dados
+            dados.forEach((item, index) => {
+                if (index < 5) { // Log dos primeiros 5 apenas
+                    console.log(`📊 Registro ${index + 1}:`, {
+                        cliente: item.cliente,
+                        servico: item.servico,
+                        solicitante: item.solicitante,
+                        status: item.status,
+                        data: item.data,
+                        prazo: item.prazo
+                    });
+                }
+            });
             
             // Calcular e renderizar todas as seções
+            console.log('📊 Renderizando KPIs...');
             renderKPIs(dados);
+            
+            console.log('📊 Renderizando distribuição de status...');
             renderStatusDistribution(dados);
+            
+            console.log('📊 Renderizando top serviços...');
             renderTopServices(dados);
+            
+            console.log('📊 Renderizando ranking de solicitantes...');
             renderTopSolicitantes(dados);
+            
+            console.log('📊 Renderizando volume mensal...');
             renderMonthlyVolume(dados);
             
             // Atualizar timestamp
@@ -132,35 +156,148 @@ async function loadDashboardData() {
     }
 }
 
-// Renderizar KPIs principais - MELHORADO
+// Renderizar KPIs principais - MELHORADO COM CORREÇÃO DE DATA
 function renderKPIs(dados) {
+    console.log('📊 Processando KPIs para', dados.length, 'registros');
+    
     const agora = new Date();
     const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1);
     const mesAnterior = new Date(agora.getFullYear(), agora.getMonth() - 1, 1);
     const fimMesAnterior = new Date(agora.getFullYear(), agora.getMonth(), 0);
     
+    console.log('📅 Período atual:', {
+        agora: agora.toLocaleDateString('pt-BR'),
+        inicioMes: inicioMes.toLocaleDateString('pt-BR'),
+        mesAnterior: mesAnterior.toLocaleDateString('pt-BR')
+    });
+    
+    // Função para converter data string em Date
+    function parseDataItem(dataStr) {
+        if (!dataStr) return null;
+        
+        try {
+            // Se já é um objeto Date
+            if (dataStr instanceof Date) {
+                return dataStr;
+            }
+            
+            // Se é string no formato brasileiro "13/07/2025"
+            if (typeof dataStr === 'string' && dataStr.match(/^\d{2}\/\d{2}\/\d{4}/)) {
+                const [dia, mes, ano] = dataStr.split('/');
+                return new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia));
+            }
+            
+            // Se é string ISO ou outro formato
+            const date = new Date(dataStr);
+            return isNaN(date.getTime()) ? null : date;
+        } catch (error) {
+            console.warn('⚠️ Erro ao processar data:', dataStr, error);
+            return null;
+        }
+    }
+    
     // Solicitações deste mês
     const solicitacoesMes = dados.filter(item => {
-        const dataItem = new Date(item.data);
-        return dataItem >= inicioMes;
+        const dataItem = parseDataItem(item.data);
+        if (!dataItem) return false;
+        
+        const resultado = dataItem >= inicioMes;
+        console.log('📊 Item:', item.cliente, 'Data:', dataItem.toLocaleDateString('pt-BR'), 'Este mês?', resultado);
+        return resultado;
     }).length;
     
     // Solicitações do mês anterior (para comparação)
     const solicitacoesMesAnterior = dados.filter(item => {
-        const dataItem = new Date(item.data);
+        const dataItem = parseDataItem(item.data);
+        if (!dataItem) return false;
         return dataItem >= mesAnterior && dataItem <= fimMesAnterior;
     }).length;
     
-    // Calcular tempo médio de resposta baseado em dados reais
+    // Calcular tempo médio de resposta REAL baseado nas datas
     const solicitacoesFinalizadas = dados.filter(item => item.status === 'Concluído');
     let tempoMedio = 0;
+    let tempoMedioTexto = 'N/A';
     
     if (solicitacoesFinalizadas.length > 0) {
-        // Simular tempo médio baseado no volume (mais dados = mais tempo)
-        const volumeFator = Math.min(solicitacoesFinalizadas.length / 10, 5);
-        tempoMedio = Math.round(1.5 + volumeFator + Math.random() * 2);
-    } else {
-        tempoMedio = 0;
+        console.log('📊 Calculando tempo médio para', solicitacoesFinalizadas.length, 'solicitações finalizadas');
+        
+        const temposResposta = [];
+        
+        solicitacoesFinalizadas.forEach((item, index) => {
+            try {
+                // Data de criação
+                const dataCriacao = parseDataItem(item.data);
+                
+                // Data de finalização (data_atualizacao ou data se não tiver)
+                const dataFinalizacao = parseDataItem(item.data_atualizacao) || dataCriacao;
+                
+                if (dataCriacao && dataFinalizacao) {
+                    // Calcular diferença em milissegundos
+                    const diferencaMs = dataFinalizacao.getTime() - dataCriacao.getTime();
+                    const diferencaHoras = diferencaMs / (1000 * 60 * 60);
+                    const diferencaDias = diferencaMs / (1000 * 60 * 60 * 24);
+                    
+                    console.log(`📊 Item ${index + 1} (${item.cliente}):`, {
+                        criacao: dataCriacao.toLocaleString('pt-BR'),
+                        finalizacao: dataFinalizacao.toLocaleString('pt-BR'),
+                        horas: Math.round(diferencaHoras * 10) / 10,
+                        dias: Math.round(diferencaDias * 10) / 10
+                    });
+                    
+                    // Se foi no mesmo dia ou menos de 24h, usar horas
+                    if (diferencaHoras <= 24) {
+                        temposResposta.push({ tipo: 'horas', valor: diferencaHoras });
+                    } else {
+                        temposResposta.push({ tipo: 'dias', valor: diferencaDias });
+                    }
+                } else {
+                    console.warn('⚠️ Datas inválidas para item:', item.cliente, {
+                        data: item.data,
+                        data_atualizacao: item.data_atualizacao
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Erro ao calcular tempo para item:', item.cliente, error);
+            }
+        });
+        
+        if (temposResposta.length > 0) {
+            // Separar por tipo
+            const temposHoras = temposResposta.filter(t => t.tipo === 'horas');
+            const temposDias = temposResposta.filter(t => t.tipo === 'dias');
+            
+            if (temposHoras.length > temposDias.length) {
+                // Maioria em horas
+                const mediaHoras = temposHoras.reduce((acc, t) => acc + t.valor, 0) / temposHoras.length;
+                tempoMedio = Math.round(mediaHoras * 10) / 10;
+                tempoMedioTexto = `${tempoMedio}h`;
+            } else if (temposDias.length > 0) {
+                // Maioria em dias
+                const mediaDias = temposDias.reduce((acc, t) => acc + t.valor, 0) / temposDias.length;
+                tempoMedio = Math.round(mediaDias * 10) / 10;
+                tempoMedioTexto = `${tempoMedio} dias`;
+            } else {
+                // Misto - converter tudo para horas se < 48h total
+                const totalHoras = temposResposta.reduce((acc, t) => {
+                    return acc + (t.tipo === 'dias' ? t.valor * 24 : t.valor);
+                }, 0) / temposResposta.length;
+                
+                if (totalHoras < 48) {
+                    tempoMedio = Math.round(totalHoras * 10) / 10;
+                    tempoMedioTexto = `${tempoMedio}h`;
+                } else {
+                    tempoMedio = Math.round((totalHoras / 24) * 10) / 10;
+                    tempoMedioTexto = `${tempoMedio} dias`;
+                }
+            }
+            
+            console.log('📊 Tempo médio calculado:', {
+                totalItens: temposResposta.length,
+                temposHoras: temposHoras.length,
+                temposDias: temposDias.length,
+                resultado: tempoMedioTexto
+            });
+        }
     }
     
     // Taxa de finalização
@@ -177,7 +314,7 @@ function renderKPIs(dados) {
     const kpiTaxa = document.getElementById('kpi-taxa');
     
     if (kpiMes) kpiMes.textContent = solicitacoesMes;
-    if (kpiTempo) kpiTempo.textContent = tempoMedio > 0 ? `${tempoMedio} dias` : 'N/A';
+    if (kpiTempo) kpiTempo.textContent = tempoMedioTexto;
     if (kpiTaxa) kpiTaxa.textContent = `${taxaFinalizacao}%`;
     
     // Atualizar trends com dados reais
@@ -193,11 +330,32 @@ function renderKPIs(dados) {
     }
     
     if (kpiTempoTrend) {
-        const tempoTrend = tempoMedio <= 3 ? 'positive' : tempoMedio <= 5 ? 'neutral' : 'negative';
-        const tempoIcon = tempoMedio <= 3 ? '↗' : tempoMedio <= 5 ? '→' : '↘';
-        const tempoTexto = tempoMedio <= 3 ? 'Rápido' : tempoMedio <= 5 ? 'Normal' : 'Lento';
-        kpiTempoTrend.innerHTML = `<span class="${tempoTrend}">${tempoIcon} ${tempoTexto}</span>`;
-        kpiTempoTrend.className = `kpi-trend ${tempoTrend}`;
+        if (tempoMedioTexto === 'N/A') {
+            kpiTempoTrend.innerHTML = `<span class="neutral">→ Sem dados</span>`;
+            kpiTempoTrend.className = `kpi-trend neutral`;
+        } else {
+            // Determinar se é rápido baseado no valor e unidade
+            let isRapido = false;
+            let tempoTexto = '';
+            
+            if (tempoMedioTexto.includes('h')) {
+                // Em horas
+                const horas = parseFloat(tempoMedioTexto);
+                isRapido = horas <= 8; // Menos de 8 horas é rápido
+                tempoTexto = horas <= 4 ? 'Muito Rápido' : horas <= 8 ? 'Rápido' : 'Normal';
+            } else {
+                // Em dias
+                const dias = parseFloat(tempoMedioTexto);
+                isRapido = dias <= 1; // Menos de 1 dia é rápido
+                tempoTexto = dias <= 1 ? 'Rápido' : dias <= 3 ? 'Normal' : 'Lento';
+            }
+            
+            const tempoTrend = isRapido ? 'positive' : tempoTexto === 'Normal' ? 'neutral' : 'negative';
+            const tempoIcon = isRapido ? '⚡' : tempoTexto === 'Normal' ? '→' : '🐌';
+            
+            kpiTempoTrend.innerHTML = `<span class="${tempoTrend}">${tempoIcon} ${tempoTexto}</span>`;
+            kpiTempoTrend.className = `kpi-trend ${tempoTrend}`;
+        }
     }
     
     if (kpiTaxaTrend) {
@@ -216,13 +374,31 @@ function renderKPIs(dados) {
     });
 }
 
-// Renderizar distribuição por status
+// Renderizar distribuição por status - CORRIGIDO
 function renderStatusDistribution(dados) {
+    console.log('📊 Processando distribuição de status para', dados.length, 'registros');
+    
+    // Contar por status com log detalhado
     const statusCount = {
-        'Em Andamento': dados.filter(item => item.status === 'Em Andamento').length,
-        'Concluído': dados.filter(item => item.status === 'Concluído').length,
-        'Pendente': dados.filter(item => item.status === 'Pendente').length
+        'Em Andamento': 0,
+        'Concluído': 0,
+        'Pendente': 0
     };
+    
+    dados.forEach((item, index) => {
+        const status = item.status || 'Pendente';
+        console.log(`📊 Item ${index + 1}: ${item.cliente} - Status: "${status}"`);
+        
+        if (status === 'Em Andamento') {
+            statusCount['Em Andamento']++;
+        } else if (status === 'Concluído') {
+            statusCount['Concluído']++;
+        } else {
+            statusCount['Pendente']++;
+        }
+    });
+    
+    console.log('📊 Contagem final por status:', statusCount);
     
     const total = dados.length || 1; // Evitar divisão por zero
     
@@ -230,6 +406,13 @@ function renderStatusDistribution(dados) {
     const percentAndamento = Math.round((statusCount['Em Andamento'] / total) * 100);
     const percentFinalizado = Math.round((statusCount['Concluído'] / total) * 100);
     const percentAberto = Math.round((statusCount['Pendente'] / total) * 100);
+    
+    console.log('📊 Percentuais calculados:', {
+        percentAndamento,
+        percentFinalizado,
+        percentAberto,
+        total
+    });
     
     // Atualizar barras e percentuais
     const barAndamento = document.getElementById('bar-andamento');
@@ -373,22 +556,51 @@ function renderTopSolicitantes(dados) {
     console.log('✅ Ranking de solicitantes renderizado:', topSolicitantes.length, 'itens');
 }
 
-// Renderizar volume mensal
+// Renderizar volume mensal - CORRIGIDO
 function renderMonthlyVolume(dados) {
+    console.log('📊 Processando volume mensal para', dados.length, 'registros');
+    
     const monthCounts = {};
     const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
     
     // Inicializar contadores
     meses.forEach(mes => monthCounts[mes] = 0);
     
-    // Contar por mês
-    dados.forEach(item => {
-        if (item.data) {
-            const data = new Date(item.data);
-            const mes = meses[data.getMonth()];
+    // Função para converter data (igual ao KPI)
+    function parseDataItem(dataStr) {
+        if (!dataStr) return null;
+        
+        try {
+            if (dataStr instanceof Date) {
+                return dataStr;
+            }
+            
+            if (typeof dataStr === 'string' && dataStr.match(/^\d{2}\/\d{2}\/\d{4}/)) {
+                const [dia, mes, ano] = dataStr.split('/');
+                return new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia));
+            }
+            
+            const date = new Date(dataStr);
+            return isNaN(date.getTime()) ? null : date;
+        } catch (error) {
+            console.warn('⚠️ Erro ao processar data:', dataStr, error);
+            return null;
+        }
+    }
+    
+    // Contar por mês com log detalhado
+    dados.forEach((item, index) => {
+        const dataItem = parseDataItem(item.data);
+        if (dataItem) {
+            const mes = meses[dataItem.getMonth()];
             monthCounts[mes]++;
+            console.log(`📊 Item ${index + 1}: ${item.cliente} - Data: ${dataItem.toLocaleDateString('pt-BR')} - Mês: ${mes}`);
+        } else {
+            console.warn('⚠️ Data inválida para item:', item.cliente, item.data);
         }
     });
+    
+    console.log('📊 Contagem mensal:', monthCounts);
     
     const maxCount = Math.max(...Object.values(monthCounts)) || 1;
     const container = document.getElementById('monthly-chart');

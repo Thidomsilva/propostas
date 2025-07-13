@@ -16,6 +16,18 @@ async function loadSolicitacoes() {
         
         if (response && isSuccess && Array.isArray(dados)) {
             solicitacoes = dados;
+            
+            // Debug específico para prazos
+            console.log('🔍 DEBUG PRAZOS:');
+            dados.forEach((item, index) => {
+                console.log(`  Item ${index + 1} (ID: ${item.id}):`, {
+                    prazo: item.prazo,
+                    tipo: typeof item.prazo,
+                    status: item.status,
+                    data: item.data
+                });
+            });
+            
             renderSolicitacoes();
             console.log('✅ Solicitações carregadas:', solicitacoes.length);
             showToast(`${solicitacoes.length} solicitações carregadas`, 'success');
@@ -50,7 +62,23 @@ function renderSolicitacoes() {
         return;
     }
     
-    tbody.innerHTML = solicitacoes.map(item => `
+    tbody.innerHTML = solicitacoes.map(item => {
+        // Debug para prazo
+        console.log(`🔍 Processando item ${item.id}: prazo="${item.prazo}", tipo=${typeof item.prazo}`);
+        
+        // Formatação melhorada para prazo
+        let prazoFormatado = '-';
+        if (item.prazo) {
+            // Se o prazo parece ser uma data, formatar
+            if (item.prazo.includes('-') || item.prazo.includes('/') || /\d{4}/.test(item.prazo)) {
+                prazoFormatado = formatDate(item.prazo);
+            } else {
+                // Se não é uma data, mostrar como texto
+                prazoFormatado = item.prazo;
+            }
+        }
+        
+        return `
         <tr data-id="${item.id}">
             <td>${item.id || '-'}</td>
             <td>${item.cliente || '-'}</td>
@@ -62,7 +90,9 @@ function renderSolicitacoes() {
                 </span>
             </td>
             <td>${formatDate(item.data) || '-'}</td>
-            <td>${formatDate(item.prazo) || '-'}</td>
+            <td style="font-weight: ${prazoFormatado !== '-' ? 'bold' : 'normal'}; color: ${prazoFormatado !== '-' ? '#2c5aa0' : '#999'};">
+                ${prazoFormatado}
+            </td>
             <td>
                 <select class="form-control" onchange="updateStatus('${item.id}', this.value)">
                     <option value="Pendente" ${item.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
@@ -72,7 +102,8 @@ function renderSolicitacoes() {
                 </select>
             </td>
         </tr>
-    `).join('');
+    `;
+    }).join('');
 }
 
 // Atualizar apenas uma linha específica da tabela
@@ -82,6 +113,18 @@ function updateSingleRow(id, item) {
     
     const row = tbody.querySelector(`tr[data-id="${id}"]`);
     if (!row) return false;
+    
+    // Formatação melhorada para prazo
+    let prazoFormatado = '-';
+    if (item.prazo) {
+        // Se o prazo parece ser uma data, formatar
+        if (item.prazo.includes('-') || item.prazo.includes('/') || /\d{4}/.test(item.prazo)) {
+            prazoFormatado = formatDate(item.prazo);
+        } else {
+            // Se não é uma data, mostrar como texto
+            prazoFormatado = item.prazo;
+        }
+    }
     
     row.innerHTML = `
         <td>${item.id || '-'}</td>
@@ -94,7 +137,9 @@ function updateSingleRow(id, item) {
             </span>
         </td>
         <td>${formatDate(item.data) || '-'}</td>
-        <td>${formatDate(item.prazo) || '-'}</td>
+        <td style="font-weight: ${prazoFormatado !== '-' ? 'bold' : 'normal'}; color: ${prazoFormatado !== '-' ? '#2c5aa0' : '#999'};">
+            ${prazoFormatado}
+        </td>
         <td>
             <select class="form-control" onchange="updateStatus('${item.id}', this.value)">
                 <option value="Pendente" ${item.status === 'Pendente' ? 'selected' : ''}>Pendente</option>

@@ -1,7 +1,7 @@
 // === CONFIGURAÇÃO ===
 const API_CONFIG = {
-    // URL do Google Apps Script Web App - VERSÃO ATUALIZADA
-    BASE_URL: 'https://script.google.com/macros/s/AKfycbw-jMfWF5F7I_1kRUddL7ou7Y6JtJeDs271CV2sT1mOwcLEUESy3oOkGDMl7eA4b6kiBw/exec',
+    // URL do Google Apps Script Web App - VERSÃO ANTI-DUPLICAÇÃO RÍGIDA
+    BASE_URL: 'https://script.google.com/macros/s/AKfycbyEKxgtsZTqVkEBVshHzWkgBIKHF5FUGRsVJ3YcuhH0h13yulyT4AeBq41fqOJOs9WtTg/exec',
     
     // Cache buster para forçar atualização
     CACHE_BUSTER: Date.now(),
@@ -314,10 +314,25 @@ function formatDate(dateString) {
     if (!dateString) return '-';
     
     try {
+        // Se a string contém palavras como status, não é uma data
+        if (typeof dateString === 'string') {
+            const statusWords = ['pendente', 'andamento', 'concluído', 'concluido', 'cancelado', 'finalizado'];
+            const isStatus = statusWords.some(word => dateString.toLowerCase().includes(word));
+            if (isStatus) {
+                return dateString; // Retorna como texto se for um status
+            }
+        }
+        
         const date = new Date(dateString);
+        
+        // Verificar se a data é válida
+        if (isNaN(date.getTime())) {
+            return dateString; // Retorna como texto se não for uma data válida
+        }
+        
         return date.toLocaleDateString('pt-BR');
     } catch (error) {
-        return '-';
+        return dateString || '-';
     }
 }
 
